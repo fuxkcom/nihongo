@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>一日の日本語 | 500+句从起床到入睡＋出行购物餐饮全场景日语</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+SC:wght@500;700&family=Noto+Sans+SC:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* ---- 时间色板：一天从黎明到深夜的天空色 ---- */
+    --dawn-1:#f4c9a8; --dawn-2:#f7e0c6; --dawn-ink:#7a4a34;
+    --morning-1:#bfe3ef; --morning-2:#eaf6f2; --morning-ink:#1f5866;
+    --noon-1:#ffe28a; --noon-2:#fff6db; --noon-ink:#8a5a12;
+    --after-1:#ffc98a; --after-2:#ffe4b8; --after-ink:#874a1a;
+    --dusk-1:#c9a3d4; --dusk-2:#f0d9d0; --dusk-ink:#5a3966;
+    --eve-1:#8b8fc9; --eve-2:#d9d6ef; --eve-ink:#333066;
+    --night-1:#2a3266; --night-2:#4a4a86; --night-ink:#e8e6ff;
+
+    /* ---- 场景分类色板 ---- */
+    --travel-1:#4d7ea8; --travel-2:#e8f1f8; --travel-ink:#2b5a80;
+    --shop-1:#d9704f; --shop-2:#fbeee7; --shop-ink:#a8492a;
+    --food-1:#c9622f; --food-2:#fdf1e4; --food-ink:#8f4218;
+    --errand-1:#2f8f6f; --errand-2:#e7f5ef; --errand-ink:#1e6b52;
+    --social-1:#8a5fb0; --social-2:#f2ecf9; --social-ink:#623a87;
+    --emg-1:#c0392b; --emg-2:#fbe9e7; --emg-ink:#96281c;
+
+    --paper:#fbf8f2;
+    --ink:#2c2620;
+    --line:#e4dcc9;
+    --gold:#c98a3e;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Noto Sans SC","Noto Sans JP",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---------- 顶部 Hero ---------- */
+  .hero{
+    position:relative;
+    min-height:88vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    background:linear-gradient(180deg,#f4c9a8 0%, #bfe3ef 35%, #eaf6f2 60%, #fbf8f2 100%);
+    overflow:hidden;
+    padding:40px 20px 60px;
+  }
+  .hero-arc{
+    position:absolute;
+    top:8%;
+    left:50%;
+    transform:translateX(-50%);
+    width:min(900px, 140vw);
+    height:min(900px, 140vw);
+    border-radius:50%;
+    border:1.5px dashed rgba(122,74,52,0.35);
+  }
+  .hero-sun{
+    position:absolute;
+    width:26px;height:26px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #fff6d8, var(--gold) 70%);
+    box-shadow:0 0 26px 6px rgba(201,138,62,0.5);
+    top:8%;
+    left:calc(50% - 13px);
+    animation:sunArc 8s ease-in-out infinite alternate;
+  }
+  @keyframes sunArc{
+    0%{ transform: rotate(-58deg) translateY(-320px) rotate(58deg); opacity:.85;}
+    100%{ transform: rotate(58deg) translateY(-320px) rotate(-58deg); opacity:1;}
+  }
+  .eyebrow{
+    font-family:"Zen Kaku Gothic New",sans-serif;
+    letter-spacing:.35em;
+    font-size:11px;
+    color:var(--dawn-ink);
+    text-transform:uppercase;
+    margin-bottom:16px;
+    z-index:2;
+  }
+  h1.title{
+    font-family:"Noto Serif JP","Noto Serif SC",serif;
+    font-size:clamp(34px,6.4vw,66px);
+    line-height:1.25;
+    margin:0 0 14px;
+    font-weight:700;
+    color:#3a2a1c;
+    z-index:2;
+  }
+  h1.title .accent{ color:var(--gold); }
+  .subtitle{
+    font-size:clamp(15px,2vw,18px);
+    color:#5a4a38;
+    max-width:600px;
+    margin:0 auto 26px;
+    line-height:1.85;
+    z-index:2;
+  }
+  .hero-caption{
+    z-index:2;
+    font-size:13px;
+    color:#6a5a46;
+    letter-spacing:.05em;
+  }
+  .hero-caption span{ font-weight:700; color:var(--gold); }
+  .hero-stats{
+    display:flex; gap:10px; flex-wrap:wrap; justify-content:center;
+    margin-top:22px; z-index:2;
+  }
+  .hero-stats .stat{
+    background:rgba(255,255,255,0.65);
+    border:1px solid rgba(122,74,52,0.2);
+    border-radius:20px;
+    padding:6px 16px;
+    font-size:12.5px;
+    color:#5a4a38;
+  }
+  .hero-stats .stat b{ color:var(--gold); font-size:14px; }
+
+  /* ---------- 固定侧边：一日进度轨（仅时间线区域使用） ---------- */
+  .daytrack{
+    position:fixed;
+    right:18px;
+    top:50%;
+    transform:translateY(-50%);
+    z-index:50;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:0;
+    transition:opacity .3s ease;
+  }
+  .daytrack .rail{
+    position:relative;
+    width:2px;
+    height:260px;
+    background:linear-gradient(180deg,#f4c9a8,#bfe3ef,#ffe28a,#ffc98a,#c9a3d4,#8b8fc9,#2a3266);
+    border-radius:2px;
+    opacity:.55;
+  }
+  .daytrack .marker{
+    position:absolute;
+    left:50%;
+    width:15px;height:15px;
+    border-radius:50%;
+    background:var(--gold);
+    border:2px solid #fff;
+    box-shadow:0 0 0 2px rgba(201,138,62,.35);
+    transform:translate(-50%,-50%);
+    transition:top .25s ease;
+    top:0;
+  }
+  .daytrack .clocklabel{
+    margin-top:10px;
+    font-size:11px;
+    font-weight:700;
+    color:var(--ink);
+    background:#fff;
+    padding:3px 9px;
+    border-radius:20px;
+    border:1px solid var(--line);
+    white-space:nowrap;
+  }
+  @media (max-width:820px){ .daytrack{display:none;} }
+
+  /* ---------- 分区容器（时间线） ---------- */
+  .period{ position:relative; padding:80px 20px 90px; scroll-margin-top:20px; }
+  .period-inner{ max-width:960px; margin:0 auto; }
+  .period-head{ display:flex; align-items:baseline; gap:18px; margin-bottom:10px; flex-wrap:wrap; }
+  .period-time{
+    font-family:"Noto Serif JP",serif; font-weight:700; font-size:13px;
+    letter-spacing:.15em; padding:5px 14px; border-radius:20px; border:1px solid currentColor;
+  }
+  .period-jp{ font-family:"Noto Serif JP",serif; font-size:clamp(26px,4vw,42px); font-weight:700; margin:0; }
+  .period-zh{ font-family:"Noto Serif SC",serif; font-size:14px; color:#6b6153; margin:0 0 36px; padding-left:2px; }
+
+  .p-dawn    { background:linear-gradient(180deg,var(--dawn-2),var(--paper)); color:var(--dawn-ink); }
+  .p-morning { background:linear-gradient(180deg,var(--morning-2),var(--paper)); color:var(--morning-ink); }
+  .p-noon    { background:linear-gradient(180deg,var(--noon-2),var(--paper)); color:var(--noon-ink); }
+  .p-after   { background:linear-gradient(180deg,var(--after-2),var(--paper)); color:var(--after-ink); }
+  .p-dusk    { background:linear-gradient(180deg,var(--dusk-2),var(--paper)); color:var(--dusk-ink); }
+  .p-eve     { background:linear-gradient(180deg,var(--eve-2),var(--paper)); color:var(--eve-ink); }
+  .p-night   { background:linear-gradient(180deg,var(--night-1),var(--night-2)); color:var(--night-ink); }
+  .p-night .card{ background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.18); }
+  .p-night .card .jp{ color:#fff; }
+  .p-night .romaji{ color:#c9c6ee; }
+  .p-night .zh{ color:#e4e2ff;}
+  .p-night .period-zh{ color:#c9c6ee; }
+  .p-night .usage{ color:#a9a6d6; border-top-color:rgba(255,255,255,0.15);}
+
+  /* ---------- 短语卡片 ---------- */
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:14px; }
+  .card{
+    background:#fff; border:1px solid var(--line); border-radius:14px;
+    padding:18px 18px 16px; transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .card:hover{ transform:translateY(-3px); box-shadow:0 10px 22px rgba(0,0,0,0.08); }
+  .card .jp{ font-family:"Noto Serif JP",serif; font-size:21px; font-weight:600; margin:0 0 6px; color:#2c2620; line-height:1.5; }
+  .card .romaji{ font-size:12.5px; color:#8a8070; font-style:italic; margin:0 0 9px; letter-spacing:.02em; }
+  .card .zh{ font-size:14.5px; font-weight:500; margin:0; color:#3a332a; }
+  .card .usage{ margin-top:9px; padding-top:9px; border-top:1px dashed var(--line); font-size:12px; color:#8a8070; line-height:1.6; }
+
+  /* ---------- 对话小剧场 ---------- */
+  .dialogue{ margin-top:24px; background:rgba(255,255,255,0.55); border:1px solid var(--line); border-radius:14px; padding:18px 22px; }
+  .p-night .dialogue{ background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.18); }
+  .dialogue-title{ font-size:12px; letter-spacing:.15em; font-weight:700; opacity:.7; margin:0 0 12px; }
+  .line{ display:flex; gap:10px; margin-bottom:8px; align-items:baseline; flex-wrap:wrap; }
+  .line b{ font-family:"Noto Serif JP",serif; font-size:15px; min-width:34px;}
+  .line .l-jp{ font-family:"Noto Serif JP",serif; font-weight:600; }
+  .line .l-zh{ font-size:12.5px; opacity:.75; }
+
+  /* ---------- 分界：时间线 → 场景大全 ---------- */
+  .divider{
+    position:relative; padding:80px 20px 60px; text-align:center;
+    background:linear-gradient(180deg,var(--paper), #f2ede0);
+  }
+  .divider .eyebrow{ color:var(--gold); }
+  .divider h2{
+    font-family:"Noto Serif JP","Noto Serif SC",serif; font-size:clamp(28px,4.5vw,44px);
+    margin:8px 0 12px; font-weight:700;
+  }
+  .divider p{ color:#6b6153; max-width:520px; margin:0 auto; font-size:14.5px; line-height:1.8; }
+  .divider .line-deco{ width:60px; height:2px; background:var(--gold); margin:22px auto 0; opacity:.5; }
+
+  /* ---------- Part（场景大类）容器 ---------- */
+  .part{ position:relative; padding:70px 20px 30px; scroll-margin-top:20px; }
+  .part-head{ margin-bottom:34px; text-align:left; }
+  .part-jp{ font-family:"Noto Serif JP","Noto Serif SC",serif; font-size:clamp(26px,4vw,38px); font-weight:700; margin:0 0 6px; }
+  .part-zh{ font-size:14px; color:#6b6153; margin:0; }
+
+  .cat-travel { background:linear-gradient(180deg,var(--travel-2),var(--paper)); color:var(--travel-ink); }
+  .cat-shop   { background:linear-gradient(180deg,var(--shop-2),var(--paper)); color:var(--shop-ink); }
+  .cat-food   { background:linear-gradient(180deg,var(--food-2),var(--paper)); color:var(--food-ink); }
+  .cat-errand { background:linear-gradient(180deg,var(--errand-2),var(--paper)); color:var(--errand-ink); }
+  .cat-social { background:linear-gradient(180deg,var(--social-2),var(--paper)); color:var(--social-ink); }
+  .cat-emg    { background:linear-gradient(180deg,var(--emg-2),var(--paper)); color:var(--emg-ink); }
+
+  .subsec{ margin-bottom:44px; }
+  .subsec-title{
+    font-family:"Noto Serif JP",serif; font-size:19px; font-weight:700;
+    margin:0 0 16px; display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;
+  }
+  .subsec-zh{ font-family:"Noto Sans SC",sans-serif; font-size:13px; font-weight:500; opacity:.7; }
+  .subsec-title .count{
+    margin-left:auto; font-size:11px; font-weight:700; padding:3px 10px;
+    border-radius:20px; border:1px solid currentColor; opacity:.75;
+  }
+
+  /* ---------- footer ---------- */
+  footer{ background:var(--night-1); color:#c9c6ee; text-align:center; padding:60px 20px 50px; font-size:13px; line-height:2; }
+  footer .moon{
+    width:34px;height:34px; border-radius:50%;
+    background:radial-gradient(circle at 32% 30%, #fff, #d9d6ef 70%);
+    margin:0 auto 18px; box-shadow:0 0 22px 4px rgba(217,214,239,0.4);
+  }
+  footer strong{ color:#fff; }
+
+  /* ---------- 顶部/移动端导航 ---------- */
+  .navbar{
+    position:sticky; top:0; z-index:60;
+    background:rgba(251,248,242,0.94);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+    overflow-x:auto; white-space:nowrap;
+    padding:12px 18px;
+    display:flex; gap:6px; align-items:center;
+  }
+  .navbar .navlabel{ font-size:11px; font-weight:700; color:#8a8070; margin-right:6px; letter-spacing:.05em; }
+  .navbar a{
+    display:inline-block; font-size:12px; padding:6px 13px; margin-right:4px;
+    border-radius:20px; border:1px solid var(--line); color:var(--ink); text-decoration:none;
+    flex-shrink:0;
+  }
+  .navbar a:hover{ background:var(--gold); color:#fff; border-color:var(--gold); }
+</style>
+</head>
+<body>
+
+<!-- ============ 顶部导航 ============ -->
+<nav class="navbar">
+  <span class="navlabel">一日时间线</span>
+  <a href="#s1">起床</a><a href="#s2">洗漱</a><a href="#s3">早餐</a><a href="#s4">通勤</a>
+  <a href="#s5">工作</a><a href="#s6">午餐</a><a href="#s7">下班</a><a href="#s8">晚餐</a>
+  <a href="#s9">居家</a><a href="#s10">睡前</a>
+  <span class="navlabel" style="margin-left:14px;">场景大全</span>
+  <a href="#part-travel">出行</a><a href="#part-shop">购物</a><a href="#part-food">餐饮</a>
+  <a href="#part-errand">办事</a><a href="#part-social">社交</a><a href="#part-emg">应急</a>
+</nav>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="hero-arc"></div>
+  <div class="hero-sun"></div>
+  <div class="eyebrow">A DAY IN JAPANESE — 起床から就寝まで、そして街へ</div>
+  <h1 class="title">一日の<span class="accent">日本語</span><br>从睁眼到入睡的生活全场景</h1>
+  <p class="subtitle">跟着一天24小时的真实生活节奏学日语，再延伸到地铁、出租车、购物、餐厅、医院、银行、打电话、周末社交与应急求助 —— 不是背单词表，是把日语过成生活本身。</p>
+  <div class="hero-stats">
+    <div class="stat"><b>513</b> 条实用短语</div>
+    <div class="stat"><b>26</b> 个生活场景</div>
+    <div class="stat"><b>10</b> 段时间线 + <b>6</b> 大场景板块</div>
+    <div class="stat"><b>4</b> 段情景对话</div>
+  </div>
+</section>
+
+<!-- ============ 侧边时间轴 ============ -->
+<div class="daytrack" id="daytrack">
+  <div class="rail"><div class="marker" id="trackMarker"></div></div>
+  <div class="clocklabel" id="trackLabel">06:30</div>
+</div>
+
+
+<section class="period p-dawn" id="s1" data-time="06:30">
+  <div class="period-inner">
+    <div class="period-head">
+      <span class="period-time">06:30</span>
+      <h2 class="period-jp">起床（きしょう）</h2>
+    </div>
+    <p class="period-zh">场景一 · 睁开眼的第一句话</p>
+    <div class="grid"><div class="card"><p class="jp">おはよう</p><p class="romaji">Ohayou</p><p class="zh">早上好（熟人/平辈）</p></div><div class="card"><p class="jp">おはようございます</p><p class="romaji">Ohayou gozaimasu</p><p class="zh">早上好（礼貌/对上司长辈）</p></div><div class="card"><p class="jp">よく眠れた？</p><p class="romaji">Yoku nemureta?</p><p class="zh">睡得好吗？</p></div><div class="card"><p class="jp">まだ眠い…</p><p class="romaji">Mada nemui…</p><p class="zh">还很困…</p></div><div class="card"><p class="jp">もう7時だ！</p><p class="romaji">Mou shichi-ji da!</p><p class="zh">已经7点了！</p></div><div class="card"><p class="jp">早く起きなきゃ</p><p class="romaji">Hayaku okinakya</p><p class="zh">得赶紧起床了</p><p class="usage">「なきゃ」是「なければ」的口语缩略，表示不得不…</p></div><div class="card"><p class="jp">アラームを止める</p><p class="romaji">Araamu wo tomeru</p><p class="zh">关掉闹钟</p></div><div class="card"><p class="jp">布団から出たくない</p><p class="romaji">Futon kara detakunai</p><p class="zh">不想从被窝里出来</p></div><div class="card"><p class="jp">目が覚めた</p><p class="romaji">Me ga sameta</p><p class="zh">醒了</p></div><div class="card"><p class="jp">二度寝する</p><p class="romaji">Nidone suru</p><p class="zh">又睡回笼觉</p></div><div class="card"><p class="jp">寝坊した！</p><p class="romaji">Nebou shita!</p><p class="zh">睡过头了！</p></div><div class="card"><p class="jp">カーテンを開ける</p><p class="romaji">Kaaten wo akeru</p><p class="zh">拉开窗帘</p></div><div class="card"><p class="jp">伸びをする</p><p class="romaji">Nobi wo suru</p><p class="zh">伸懒腰</p></div><div class="card"><p class="jp">今日の天気はどう？</p><p class="romaji">Kyou no tenki wa dou?</p><p class="zh">今天天气怎么样？</p></div><div class="card"><p class="jp">布団をたたむ</p><p class="romaji">Futon wo tatamu</p><p class="zh">叠被子</p></div><div class="card"><p class="jp">あと5分だけ</p><p class="romaji">Ato go-fun dake</p><p class="zh">再睡5分钟就好</p></div><div class="card"><p class="jp">スヌーズ機能</p><p class="romaji">Sunuuzu kinou</p><p class="zh">（闹钟的）贪睡功能</p></div><div class="card"><p class="jp">体がだるい</p><p class="romaji">Karada ga darui</p><p class="zh">身体懒懒的/浑身无力</p></div></div>
+    <div class="dialogue"><p class="dialogue-title">💬 场景对话 · 家人间的清晨</p><div class="line"><b>母</b><span class="l-jp">もう起きなさい！学校に遅れるよ。</span><span class="l-zh">快起床！上学要迟到了。</span></div><div class="line"><b>子</b><span class="l-jp">はーい、今起きる。</span><span class="l-zh">好啦，这就起来。</span></div></div>
+  </div>
+</section>
+<section class="period p-dawn" id="s2" data-time="06:45">
+  <div class="period-inner">
+    <div class="period-head">
+      <span class="period-time">06:45</span>
+      <h2 class="period-jp">身支度（みじたく）</h2>
+    </div>
+    <p class="period-zh">场景二 · 洗漱与准备出门</p>
+    <div class="grid"><div class="card"><p class="jp">顔を洗う</p><p class="romaji">Kao wo arau</p><p class="zh">洗脸</p></div><div class="card"><p class="jp">歯を磨く</p><p class="romaji">Ha wo migaku</p><p class="zh">刷牙</p></div><div class="card"><p class="jp">シャワーを浴びる</p><p class="romaji">Shawaa wo abiru</p><p class="zh">冲淋浴</p></div><div class="card"><p class="jp">髪を乾かす</p><p class="romaji">Kami wo kawakasu</p><p class="zh">吹干头发</p></div><div class="card"><p class="jp">着替える</p><p class="romaji">Kigaeru</p><p class="zh">换衣服</p></div><div class="card"><p class="jp">今日は何を着る？</p><p class="romaji">Kyou wa nani wo kiru?</p><p class="zh">今天穿什么？</p></div><div class="card"><p class="jp">化粧をする</p><p class="romaji">Keshou wo suru</p><p class="zh">化妆</p></div><div class="card"><p class="jp">鏡を見る</p><p class="romaji">Kagami wo miru</p><p class="zh">照镜子</p></div><div class="card"><p class="jp">髪をとかす</p><p class="romaji">Kami wo tokasu</p><p class="zh">梳头</p></div><div class="card"><p class="jp">ひげを剃る</p><p class="romaji">Hige wo soru</p><p class="zh">刮胡子</p></div><div class="card"><p class="jp">日焼け止めを塗る</p><p class="romaji">Hiyakedome wo nuru</p><p class="zh">涂防晒霜</p></div><div class="card"><p class="jp">洗顔料</p><p class="romaji">Sengan-ryou</p><p class="zh">洗面奶</p></div><div class="card"><p class="jp">スキンケアをする</p><p class="romaji">Sukinkea wo suru</p><p class="zh">做护肤</p></div><div class="card"><p class="jp">時間がない！</p><p class="romaji">Jikan ga nai!</p><p class="zh">没时间了！</p></div><div class="card"><p class="jp">忘れ物はない？</p><p class="romaji">Wasuremono wa nai?</p><p class="zh">没有忘带东西吧？</p></div><div class="card"><p class="jp">かばんに入れる</p><p class="romaji">Kaban ni ireru</p><p class="zh">放进包里</p></div></div>
+    
+  </div>
+</section>
+<section class="period p-morning" id="s3" data-time="07:15">
+  <div class="period-inner">
+    <div class="period-head">
+      <span class="period-time">07:15</span>
+      <h2 class="period-jp">朝ごはん（あさごはん）</h2>
+    </div>
+    <p class="period-zh">场景三 · 餐桌上的礼貌用语</p>
+    <div class="grid"><div class="card"><p class="jp">いただきます</p><p class="romaji">Itadakimasu</p><p class="zh">我开动了（饭前必说）</p></div><div class="card"><p class="jp">ごちそうさまでした</p><p class="romaji">Gochisousama deshita</p><p class="zh">我吃饱了/谢谢款待（饭后必说）</p></div><div class="card"><p class="jp">パンを食べる</p><p class="romaji">Pan wo taberu</p><p class="zh">吃面包</p></div><div class="card"><p class="jp">卵焼き</p><p class="romaji">Tamagoyaki</p><p class="zh">日式煎蛋卷</p></div><div class="card"><p class="jp">コーヒーを飲む</p><p class="romaji">Koohii wo nomu</p><p class="zh">喝咖啡</p></div><div class="card"><p class="jp">お腹すいた</p><p class="romaji">Onaka suita</p><p class="zh">肚子饿了</p></div><div class="card"><p class="jp">時間がない、急いで！</p><p class="romaji">Jikan ga nai, isoide!</p><p class="zh">没时间了，快点！</p></div><div class="card"><p class="jp">お弁当を作る</p><p class="romaji">Obentou wo tsukuru</p><p class="zh">做便当</p></div><div class="card"><p class="jp">味噌汁</p><p class="romaji">Miso shiru</p><p class="zh">味增汤</p></div><div class="card"><p class="jp">ご飯をよそう</p><p class="romaji">Gohan wo yosou</p><p class="zh">盛饭</p></div><div class="card"><p class="jp">牛乳を飲む</p><p class="romaji">Gyuunyuu wo nomu</p><p class="zh">喝牛奶</p></div><div class="card"><p class="jp">納豆が苦手</p><p class="romaji">Nattou ga nigate</p><p class="zh">不太能吃纳豆</p></div><div class="card"><p class="jp">もう少し食べる？</p><p class="romaji">Mou sukoshi taberu?</p><p class="zh">再吃一点吗？</p></div><div class="card"><p class="jp">お腹いっぱい</p><p class="romaji">Onaka ippai</p><p class="zh">吃饱了</p></div><div class="card"><p class="jp">朝は何も食べない</p><p class="romaji">Asa wa nanimo tabenai</p><p class="zh">早上什么都不吃</p></div><div class="card"><p class="jp">食器を片付ける</p><p class="romaji">Shokki wo katazukeru</p><p class="zh">收拾碗筷</p></div></div>
+    
+  </div>
+</section>
+<section class="period p-morning" id="s4" data-time="08:00">
+  <div class="period-inner">
+    <div class="period-head">
+      <span class="period-time">08:00</span>
+      <h2 class="period-jp">出勤・通学（つうきん）</h2>
+    </div>
+    <p class="period-zh">场景四 · 出门、坐车、问路</p>
+    <div class="grid"><div class="card"><p class="jp">行ってきます</p><p class="romaji">Ittekimasu</p><p class="zh">我出门了（离家时说）</p></div><div class="card"><p class="jp">行ってらっしゃい</p><p class="romaji">Itterasshai</p><p class="zh">路上小心/慢走（对方的回应）</p></div><div class="card"><p class="jp">駅はどこですか？</p><p class="romaji">Eki wa doko desu ka?</p><p class="zh">车站在哪里？</p></div><div class="card"><p class="jp">電車に乗る</p><p class="romaji">Densha ni noru</p><p class="zh">坐电车</p></div><div class="card"><p class="jp">次の駅で降ります</p><p class="romaji">Tsugi no eki de orimasu</p><p class="zh">在下一站下车</p></div><div class="card"><p class="jp">満員電車</p><p class="romaji">Man'in densha</p><p class="zh">满员的通勤电车</p></div><div class="card"><p class="jp">遅刻しそう！</p><p class="romaji">Chikoku shisou!</p><p class="zh">快要迟到了！</p></div><div class="card"><p class="jp">この道でいいですか？</p><p class="romaji">Kono michi de ii desu ka?</p><p class="zh">走这条路对吗？</p></div><div class="card"><p class="jp">傘を持った？</p><p class="romaji">Kasa wo motta?</p><p class="zh">带伞了吗？</p></div><div class="card"><p class="jp">鍵を閉める</p><p class="romaji">Kagi wo shimeru</p><p class="zh">锁门</p></div><div class="card"><p class="jp">忘れ物した！</p><p class="romaji">Wasuremono shita!</p><p class="zh">忘带东西了！</p></div><div class="card"><p class="jp">走らなきゃ</p><p class="romaji">Hashiranakya</p><p class="zh">得跑起来了</p></div><div class="card"><p class="jp">ぎりぎり間に合った</p><p class="romaji">Girigiri maniatta</p><p class="zh">堪堪赶上了</p></div><div class="card"><p class="jp">信号が赤だ</p><p class="romaji">Shingou ga aka da</p><p class="zh">红灯了</p></div></div>
+    
+  </div>
+</section>
+<section class="period p-noon" id="s5" data-time="09:00">
+  <div class="period-inner">
+    <div class="period-head">
+      <span class="period-time">09:00</span>
+      <h2 class="period-jp">仕事・授業（しごと）</h2>
+    </div>
+    <p class="period-zh">场景五 · 职场与课堂常用语</p>
+    <div class="grid"><div class="card"><p class="jp">お疲れ様です</p><p class="romaji">Otsukaresama desu</p><p class="zh">辛苦了（同事间万能问候）</p></div><div class="card"><p class="jp">承知しました</p><p class="romaji">Shouchi shimashita</p><p class="zh">明白了，知道了（对上级用）</p></div><div class="card"><p class="jp">すみません、ちょっといいですか</p><p class="romaji">Sumimasen, chotto ii desu ka</p><p class="zh">不好意思，能打扰一下吗</p></div><div class="card"><p class="jp">会議を始めます</p><p class="romaji">Kaigi wo hajimemasu</p><p class="zh">会议开始了</p></div><div class="card"><p class="jp">資料を送ります</p><p class="romaji">Shiryou wo okurimasu</p><p class="zh">我把资料发过去</p></div><div class="card"><p class="jp">質問してもいいですか</p><p class="romaji">Shitsumon shite mo ii desu ka</p><p class="zh">可以提问吗</p></div><div class="card"><p class="jp">締め切りはいつですか</p><p class="romaji">Shimekiri wa itsu desu ka</p><p class="zh">截止日期是什么时候</p></div><div class="card"><p class="jp">頑張ります</p><p class="romaji">Ganbarimasu</p><p class="zh">我会加油的</p></div><div class="card"><p class="jp">よろしくお願いします</p><p class="romaji">Yoroshiku onegaishimasu</p><p class="zh">请多关照/拜托了</p></div><div class="card"><p class="jp">かしこまりました</p><p class="romaji">Kashikomarimashita</p><p class="zh">明白了（更正式，服务业常用）</p></div><div class="card"><p class="jp">少々お待ちください</p><p class="romaji">Shoushou omachi kudasai</p><p class="zh">请稍等</p></div><div class="card"><p class="jp">残業する</p><p class="romaji">Zangyou suru</p><p class="zh">加班</p></div><div class="card"><p class="jp">休憩を取る</p><p class="romaji">Kyuukei wo toru</p><p class="zh">休息一下</p></div><div class="card"><p class="jp">メールを確認する</p><p class="romaji">Meeru wo kakunin suru</p><p class="zh">查看邮件</p></div><div class="card"><p class="jp">先に失礼します</p><p class="romaji">Saki ni shitsurei shimasu</p><p class="zh">我先失陪了</p></div><div class="card"><p class="jp">課題を提出する</p><p class="romaji">Kadai wo teishutsu suru</p><p class="zh">提交作业</p></div><div class="card"><p class="jp">先生に質問する</p><p class="romaji">Sensei ni shitsumon suru</p><p class="zh">向老师提问</p></div><div class="card"><p class="jp">集中できない</p><p class="romaji">Shuuchuu dekinai</p><p class="zh">无法集中注意力</p></div></div>
+    <div class="dialogue"><p class="dialogue-title">💬 场景对话 · 办公室里</p><div class="line"><b>A</b><span class="l-jp">この資料、確認してもらえますか。</span><span class="l-zh">能帮我确认一下这份资料吗？</span></div><div class="line"><b>B</b><span class="l-jp">はい、承知しました。すぐ見ます。</span><span class="l-zh">好的，明白了，我马上看。</span></div></div>
+  </div>
+</section>
+<section class="period p-noon" id="s6" data-time="12:00">
+  <div class="period-inner">
+    <div class="period-head">
+      <span class="period-time">12:00</span>
+      <h2 class="period-jp">昼休み（ひるやすみ）</h2>
+    </div>
+    <p class="period-zh">场景六 · 午休点餐</p>
+    <div class="grid"><div class="card"><p class="jp">お昼ご飯</p><p class="romaji">Ohiru gohan</p><p class="zh">午饭</p></div><div class="card"><p class="jp">何を食べる？</p><p class="romaji">Nani wo taberu?</p><p class="zh">吃什么？</p></div><div class="card"><p class="jp">おすすめは何ですか</p><p class="romaji">Osusume wa nan desu ka</p><p class="zh">有什么推荐的吗</p></div><div class="card"><p class="jp">これをください</p><p class="romaji">Kore wo kudasai</p><p class="zh">请给我这个</p></div><div class="card"><p class="jp">お会計お願いします</p><p class="romaji">Okaikei onegaishimasu</p><p class="zh">请结账</p></div><div class="card"><p class="jp">少し休憩しよう</p><p class="romaji">Sukoshi kyuukei shiyou</p><p class="zh">稍微休息一下吧</p></div><div class="card"><p class="jp">一緒に行かない？</p><p class="romaji">Issho ni ikanai?</p><p class="zh">要不要一起去？</p></div><div class="card"><p class="jp">眠くなってきた</p><p class="romaji">Nemuku natte kita</p><p class="zh">开始犯困了</p></div><div class="card"><p class="jp">コーヒーでも飲もうか</p><p class="romaji">Koohii demo nomou ka</p><p class="zh">去喝杯咖啡吧</p></div><div class="card"><p class="jp">社員食堂で食べる</p><p class="romaji">Shain shokudou de taberu</p><p class="zh">在员工食堂吃饭</p></div><div class="card"><p class="jp">外に食べに行く</p><p class="romaji">Soto ni tabe ni iku</p><p class="zh">出去吃</p></div><div class="card"><p class="jp">お弁当を持ってきた</p><p class="romaji">Obentou wo motte kita</p><p class="zh">带了便当来</p></div><div class="card"><p class="jp">コンビニで買う</p><p class="romaji">Konbini de kau</p><p class="zh">在便利店买</p></div><div class="card"><p class="jp">午後も頑張ろう</p><p class="romaji">Gogo mo ganbarou</p><p class="zh">下午也加油吧</p></div><div class="card"><p class="jp">眠気覚ましにコーヒー</p><p class="romaji">Nemuke samashi ni koohii</p><p class="zh">喝咖啡提神</p></div><div class="card"><p class="jp">昼寝する</p><p class="romaji">Hirune suru</p><p class="zh">午睡</p></div><div class="card"><p class="jp">あと少しで終わる</p><p class="romaji">Ato sukoshi de owaru</p><p class="zh">再一会儿就结束了</p></div><div class="card"><p class="jp">お腹いっぱいで眠い</p><p class="romaji">Onaka ippai de nemui</p><p class="zh">吃饱了好困</p></div><div class="card"><p class="jp">食べ過ぎた</p><p class="romaji">Tabesugita</p><p class="zh">吃多了</p></div></div>
+    
+  </div>
+</section>
+<section class="period p-after" id="s7" data-time="18:00">
+  <div class="period-inner">
+    <div class="period-head">
+      <span class="period-time">18:00</span>
+      <h2 class="period-jp">退勤・下校（たいきん）</h2>
+    </div>
+    <p class="period-zh">场景七 · 离开公司/学校</p>
+    <div class="grid"><div class="card"><p class="jp">お先に失礼します</p><p class="romaji">Osaki ni shitsurei shimasu</p><p class="zh">我先走了（下班经典用语）</p></div><div class="card"><p class="jp">お疲れ様でした</p><p class="romaji">Otsukaresama deshita</p><p class="zh">辛苦了（对方回应）</p></div><div class="card"><p class="jp">また明日</p><p class="romaji">Mata ashita</p><p class="zh">明天见</p></div><div class="card"><p class="jp">今日は疲れた</p><p class="romaji">Kyou wa tsukareta</p><p class="zh">今天累了</p></div><div class="card"><p class="jp">寄り道して帰る</p><p class="romaji">Yorimichi shite kaeru</p><p class="zh">绕路回家（顺便逛逛）</p></div><div class="card"><p class="jp">買い物して帰ります</p><p class="romaji">Kaimono shite kaerimasu</p><p class="zh">买点东西再回家</p></div><div class="card"><p class="jp">今日もお疲れ様</p><p class="romaji">Kyou mo otsukaresama</p><p class="zh">今天也辛苦了</p></div><div class="card"><p class="jp">やっと終わった</p><p class="romaji">Yatto owatta</p><p class="zh">终于结束了</p></div><div class="card"><p class="jp">今日は早く帰れそう</p><p class="romaji">Kyou wa hayaku kaeresou</p><p class="zh">今天好像能早点回去</p></div><div class="card"><p class="jp">残業になりそう</p><p class="romaji">Zangyou ni narisou</p><p class="zh">看来要加班了</p></div><div class="card"><p class="jp">上司に挨拶する</p><p class="romaji">Joushi ni aisatsu suru</p><p class="zh">跟上司打招呼</p></div><div class="card"><p class="jp">荷物をまとめる</p><p class="romaji">Nimotsu wo matomeru</p><p class="zh">收拾东西</p></div><div class="card"><p class="jp">同僚と一緒に帰る</p><p class="romaji">Douryou to issho ni kaeru</p><p class="zh">和同事一起回家</p></div><div class="card"><p class="jp">飲みに行く？</p><p class="romaji">Nomi ni iku?</p><p class="zh">要不要去喝一杯？</p></div><div class="card"><p class="jp">今日はまっすぐ帰ります</p><p class="romaji">Kyou wa massugu kaerimasu</p><p class="zh">今天直接回家</p></div><div class="card"><p class="jp">お先に</p><p class="romaji">Osaki ni</p><p class="zh">我先走啦（更口语的说法）</p></div></div>
+    
+  </div>
+</section>
+<section class="period p-dusk" id="s8" data-time="19:00">
+  <div class="period-inner">
+    <div class="period-head">
+      <span class="period-time">19:00</span>
+      <h2 class="period-jp">晩ご飯（ばんごはん）</h2>
+    </div>
+    <p class="period-zh">场景八 · 回家与晚饭</p>
+    <div class="grid"><div class="card"><p class="jp">ただいま</p><p class="romaji">Tadaima</p><p class="zh">我回来了</p></div><div class="card"><p class="jp">おかえりなさい</p><p class="romaji">Okaerinasai</p><p class="zh">你回来啦（家人的回应）</p></div><div class="card"><p class="jp">今日何かあった？</p><p class="romaji">Kyou nanika atta?</p><p class="zh">今天发生什么事了吗？</p></div><div class="card"><p class="jp">美味しい！</p><p class="romaji">Oishii!</p><p class="zh">好吃！</p></div><div class="card"><p class="jp">お代わりください</p><p class="romaji">Okawari kudasai</p><p class="zh">请再来一碗</p></div><div class="card"><p class="jp">手伝おうか？</p><p class="romaji">Tetsudaou ka?</p><p class="zh">要我帮忙吗？</p></div><div class="card"><p class="jp">洗い物をする</p><p class="romaji">Araimono wo suru</p><p class="zh">洗碗</p></div><div class="card"><p class="jp">味が濃い</p><p class="romaji">Aji ga koi</p><p class="zh">味道有点重</p></div><div class="card"><p class="jp">辛くない？</p><p class="romaji">Karakunai?</p><p class="zh">不辣吗？</p></div><div class="card"><p class="jp">箸を用意する</p><p class="romaji">Hashi wo youi suru</p><p class="zh">准备筷子</p></div><div class="card"><p class="jp">今日のご飯は何？</p><p class="romaji">Kyou no gohan wa nani?</p><p class="zh">今天吃什么？</p></div><div class="card"><p class="jp">残り物を温める</p><p class="romaji">Nokorimono wo atatameru</p><p class="zh">把剩菜热一下</p></div><div class="card"><p class="jp">いい匂いがする</p><p class="romaji">Ii nioi ga suru</p><p class="zh">好香啊</p></div><div class="card"><p class="jp">味付けはどう？</p><p class="romaji">Ajitsuke wa dou?</p><p class="zh">味道调得怎么样？</p></div><div class="card"><p class="jp">野菜も食べなさい</p><p class="romaji">Yasai mo tabenasai</p><p class="zh">蔬菜也要吃</p></div><div class="card"><p class="jp">好き嫌いしないで</p><p class="romaji">Sukikirai shinaide</p><p class="zh">不要挑食</p></div><div class="card"><p class="jp">お茶を入れる</p><p class="romaji">Ocha wo ireru</p><p class="zh">泡茶</p></div><div class="card"><p class="jp">食卓を囲む</p><p class="romaji">Shokutaku wo kakomu</p><p class="zh">围坐在餐桌旁</p></div></div>
+    <div class="dialogue"><p class="dialogue-title">💬 场景对话 · 玄関处</p><div class="line"><b>子</b><span class="l-jp">ただいま！お腹ペコペコ。</span><span class="l-zh">我回来了！肚子饿扁了。</span></div><div class="line"><b>母</b><span class="l-jp">おかえり。もうすぐご飯できるよ。</span><span class="l-zh">回来啦。饭马上就好了。</span></div></div>
+  </div>
+</section>
+<section class="period p-eve" id="s9" data-time="21:00">
+  <div class="period-inner">
+    <div class="period-head">
+      <span class="period-time">21:00</span>
+      <h2 class="period-jp">くつろぎタイム</h2>
+    </div>
+    <p class="period-zh">场景九 · 泡澡与放松</p>
+    <div class="grid"><div class="card"><p class="jp">お風呂に入る</p><p class="romaji">Ofuro ni hairu</p><p class="zh">泡澡/洗澡</p></div><div class="card"><p class="jp">お先にどうぞ</p><p class="romaji">Osaki ni douzo</p><p class="zh">您先请（谦让洗澡顺序）</p></div><div class="card"><p class="jp">気持ちいい〜</p><p class="romaji">Kimochi ii~</p><p class="zh">好舒服～</p></div><div class="card"><p class="jp">テレビを見る</p><p class="romaji">Terebi wo miru</p><p class="zh">看电视</p></div><div class="card"><p class="jp">スマホをいじる</p><p class="romaji">Sumaho wo ijiru</p><p class="zh">玩手机</p></div><div class="card"><p class="jp">ゆっくり休む</p><p class="romaji">Yukkuri yasumu</p><p class="zh">好好休息</p></div><div class="card"><p class="jp">明日の準備をする</p><p class="romaji">Ashita no junbi wo suru</p><p class="zh">准备明天要用的东西</p></div><div class="card"><p class="jp">洗濯物をたたむ</p><p class="romaji">Sentakumono wo tatamu</p><p class="zh">叠洗好的衣服</p></div><div class="card"><p class="jp">部屋を片付ける</p><p class="romaji">Heya wo katazukeru</p><p class="zh">收拾房间</p></div><div class="card"><p class="jp">ゴミを出す</p><p class="romaji">Gomi wo dasu</p><p class="zh">倒垃圾</p></div><div class="card"><p class="jp">音楽を聴く</p><p class="romaji">Ongaku wo kiku</p><p class="zh">听音乐</p></div><div class="card"><p class="jp">ちょっと一杯やろう</p><p class="romaji">Chotto ippai yarou</p><p class="zh">小酌一杯吧</p></div><div class="card"><p class="jp">湯船に浸かる</p><p class="romaji">Yubune ni tsukaru</p><p class="zh">泡在浴缸里</p></div><div class="card"><p class="jp">お湯が熱い</p><p class="romaji">Oyu ga atsui</p><p class="zh">水好烫</p></div><div class="card"><p class="jp">パジャマに着替える</p><p class="romaji">Pajama ni kigaeru</p><p class="zh">换上睡衣</p></div><div class="card"><p class="jp">ストレッチをする</p><p class="romaji">Sutorecchi wo suru</p><p class="zh">做拉伸运动</p></div><div class="card"><p class="jp">本を読む</p><p class="romaji">Hon wo yomu</p><p class="zh">看书</p></div><div class="card"><p class="jp">家族と話す</p><p class="romaji">Kazoku to hanasu</p><p class="zh">和家人聊天</p></div><div class="card"><p class="jp">犬の散歩に行く</p><p class="romaji">Inu no sanpo ni iku</p><p class="zh">去遛狗</p></div><div class="card"><p class="jp">植物に水をやる</p><p class="romaji">Shokubutsu ni mizu wo yaru</p><p class="zh">给植物浇水</p></div></div>
+    
+  </div>
+</section>
+<section class="period p-night" id="s10" data-time="23:00">
+  <div class="period-inner">
+    <div class="period-head">
+      <span class="period-time">23:00</span>
+      <h2 class="period-jp">寝る前（ねるまえ）</h2>
+    </div>
+    <p class="period-zh">场景十 · 一天的结尾</p>
+    <div class="grid"><div class="card"><p class="jp">歯を磨く</p><p class="romaji">Ha wo migaku</p><p class="zh">刷牙（睡前再一次）</p></div><div class="card"><p class="jp">明日は何時に起きる？</p><p class="romaji">Ashita wa nanji ni okiru?</p><p class="zh">明天几点起床？</p></div><div class="card"><p class="jp">アラームをセットする</p><p class="romaji">Araamu wo setto suru</p><p class="zh">设置闹钟</p></div><div class="card"><p class="jp">眠い</p><p class="romaji">Nemui</p><p class="zh">困了</p></div><div class="card"><p class="jp">電気を消す</p><p class="romaji">Denki wo kesu</p><p class="zh">关灯</p></div><div class="card"><p class="jp">いい夢を</p><p class="romaji">Ii yume wo</p><p class="zh">祝你好梦</p></div><div class="card"><p class="jp">おやすみなさい</p><p class="romaji">Oyasuminasai</p><p class="zh">晚安（睡前的告别语）</p></div><div class="card"><p class="jp">また明日ね</p><p class="romaji">Mata ashita ne</p><p class="zh">明天见啦</p></div><div class="card"><p class="jp">スマホを充電する</p><p class="romaji">Sumaho wo juuden suru</p><p class="zh">给手机充电</p></div><div class="card"><p class="jp">そろそろ寝よう</p><p class="romaji">Sorosoro neyou</p><p class="zh">差不多该睡了</p></div><div class="card"><p class="jp">明日も頑張ろう</p><p class="romaji">Ashita mo ganbarou</p><p class="zh">明天也加油吧</p></div><div class="card"><p class="jp">布団に入る</p><p class="romaji">Futon ni hairu</p><p class="zh">钻进被窝</p></div><div class="card"><p class="jp">今日一日お疲れ様</p><p class="romaji">Kyou ichinichi otsukaresama</p><p class="zh">今天一天辛苦了</p></div><div class="card"><p class="jp">日記をつける</p><p class="romaji">Nikki wo tsukeru</p><p class="zh">写日记</p></div><div class="card"><p class="jp">枕を整える</p><p class="romaji">Makura wo totonoeru</p><p class="zh">整理枕头</p></div><div class="card"><p class="jp">目覚まし、ちゃんとセットした？</p><p class="romaji">Mezamashi, chanto setto shita?</p><p class="zh">闹钟设置好了吗？</p></div><div class="card"><p class="jp">なかなか寝付けない</p><p class="romaji">Nakanaka netsukenai</p><p class="zh">怎么也睡不着</p></div><div class="card"><p class="jp">羊を数える</p><p class="romaji">Hitsuji wo kazoeru</p><p class="zh">数羊（帮助入睡）</p></div></div>
+    <div class="dialogue"><p class="dialogue-title">💬 场景对话 · 熄灯前</p><div class="line"><b>A</b><span class="l-jp">そろそろ寝ようか。おやすみ。</span><span class="l-zh">差不多该睡了。晚安。</span></div><div class="line"><b>B</b><span class="l-jp">うん、おやすみなさい。いい夢を。</span><span class="l-zh">嗯，晚安。祝你好梦。</span></div></div>
+  </div>
+</section>
+<!-- ============ 分界：时间线 结束 → 场景大全 开始 ============ -->
+<section class="divider">
+  <div class="eyebrow">SCENE COLLECTION — 街へ出よう</div>
+  <h2>场景大全 · 出行 / 购物 / 餐饮 / 办事 / 社交 / 应急</h2>
+  <p>一天的作息之外，生活还会走进地铁、出租车、超市、餐厅、医院、银行、理发店……以下是走出家门后最常遇到的六大类场景与300余条实用短语。</p>
+  <div class="line-deco"></div>
+</section>
+
+<section class="part cat-travel" id="part-travel">
+  <div class="period-inner">
+    <div class="part-head">
+      <h2 class="part-jp">出行场景 · 移動シーン</h2>
+      <p class="part-zh">从坐地铁到打出租车</p>
+    </div>
+    
+    <div class="subsec">
+      <h3 class="subsec-title">電車・地下鉄（でんしゃ） <span class="subsec-zh">电车与地铁</span> <span class="count">25条</span></h3>
+      <div class="grid"><div class="card"><p class="jp">切符を買う</p><p class="romaji">Kippu wo kau</p><p class="zh">买车票</p></div><div class="card"><p class="jp">ICカードをチャージする</p><p class="romaji">Aikaado wo chaaji suru</p><p class="zh">给交通卡充值</p><p class="usage">「IC卡」在日本常见的有Suica、PASMO等</p></div><div class="card"><p class="jp">改札を通る</p><p class="romaji">Kaisatsu wo tooru</p><p class="zh">通过检票口</p></div><div class="card"><p class="jp">何番線ですか？</p><p class="romaji">Nan-ban-sen desu ka?</p><p class="zh">是几号线/几号站台？</p></div><div class="card"><p class="jp">急行に乗る</p><p class="romaji">Kyuukou ni noru</p><p class="zh">乘坐急行列车</p></div><div class="card"><p class="jp">各駅停車</p><p class="romaji">Kakueki teisha</p><p class="zh">站站停的普通车</p></div><div class="card"><p class="jp">乗り換えが必要です</p><p class="romaji">Norikae ga hitsuyou desu</p><p class="zh">需要换乘</p></div><div class="card"><p class="jp">次は新宿です</p><p class="romaji">Tsugi wa Shinjuku desu</p><p class="zh">下一站是新宿</p></div><div class="card"><p class="jp">ドアが閉まります</p><p class="romaji">Doa ga shimarimasu</p><p class="zh">车门即将关闭</p></div><div class="card"><p class="jp">駆け込み乗車はおやめください</p><p class="romaji">Kakekomi jousha wa oyame kudasai</p><p class="zh">请勿冲门上车</p></div><div class="card"><p class="jp">この電車は各駅停車ですか？</p><p class="romaji">Kono densha wa kakueki teisha desu ka?</p><p class="zh">这辆电车是每站都停吗？</p></div><div class="card"><p class="jp">終電は何時ですか？</p><p class="romaji">Shuuden wa nanji desu ka?</p><p class="zh">末班车是几点？</p></div><div class="card"><p class="jp">始発に乗る</p><p class="romaji">Shihatsu ni noru</p><p class="zh">坐首班车</p></div><div class="card"><p class="jp">優先席</p><p class="romaji">Yuusenseki</p><p class="zh">博爱座/优先席</p></div><div class="card"><p class="jp">女性専用車両</p><p class="romaji">Josei sen'you sharyou</p><p class="zh">女性专用车厢</p></div><div class="card"><p class="jp">駅員に聞く</p><p class="romaji">Ekiin ni kiku</p><p class="zh">问站务员</p></div><div class="card"><p class="jp">忘れ物センター</p><p class="romaji">Wasuremono sentaa</p><p class="zh">失物招领处</p></div><div class="card"><p class="jp">反対方向の電車に乗ってしまった</p><p class="romaji">Hantai houkou no densha ni notte shimatta</p><p class="zh">坐反方向了</p></div><div class="card"><p class="jp">あと3駅です</p><p class="romaji">Ato san-eki desu</p><p class="zh">还有三站</p></div><div class="card"><p class="jp">運賃はいくらですか？</p><p class="romaji">Unchin wa ikura desu ka?</p><p class="zh">车费多少钱？</p></div><div class="card"><p class="jp">この電車、混んでいますね</p><p class="romaji">Kono densha, konde imasu ne</p><p class="zh">这趟车好挤啊</p></div><div class="card"><p class="jp">席を譲る</p><p class="romaji">Seki wo yuzuru</p><p class="zh">让座</p></div><div class="card"><p class="jp">扉にご注意ください</p><p class="romaji">Tobira ni gochuui kudasai</p><p class="zh">请注意车门</p></div><div class="card"><p class="jp">時刻表を確認する</p><p class="romaji">Jikokuhyou wo kakunin suru</p><p class="zh">查看时刻表</p></div><div class="card"><p class="jp">人身事故で遅延しています</p><p class="romaji">Jinshin jiko de chien shite imasu</p><p class="zh">因人身事故而延误</p></div></div>
+    </div>
+    <div class="subsec">
+      <h3 class="subsec-title">バス（ばす） <span class="subsec-zh">公交车</span> <span class="count">15条</span></h3>
+      <div class="grid"><div class="card"><p class="jp">バス停はどこですか？</p><p class="romaji">Basu-tei wa doko desu ka?</p><p class="zh">公交站在哪里？</p></div><div class="card"><p class="jp">このバスは駅に行きますか？</p><p class="romaji">Kono basu wa eki ni ikimasu ka?</p><p class="zh">这辆车去车站吗？</p></div><div class="card"><p class="jp">次で降ります</p><p class="romaji">Tsugi de orimasu</p><p class="zh">我在下一站下车</p></div><div class="card"><p class="jp">整理券を取る</p><p class="romaji">Seiriken wo toru</p><p class="zh">取号码牌（上车时）</p></div><div class="card"><p class="jp">後ろ乗り前降り</p><p class="romaji">Ushiro nori mae ori</p><p class="zh">从后门上车、前门下车</p></div><div class="card"><p class="jp">運賃箱に入れる</p><p class="romaji">Unchin-bako ni ireru</p><p class="zh">把车费投进钱箱</p></div><div class="card"><p class="jp">停車ボタンを押す</p><p class="romaji">Teisha botan wo osu</p><p class="zh">按下车铃</p></div><div class="card"><p class="jp">満席です</p><p class="romaji">Manseki desu</p><p class="zh">坐满了</p></div><div class="card"><p class="jp">次のバスは何分後ですか？</p><p class="romaji">Tsugi no basu wa nan-pun go desu ka?</p><p class="zh">下一班车几分钟后来？</p></div><div class="card"><p class="jp">バスに乗り遅れた</p><p class="romaji">Basu ni noriokureta</p><p class="zh">没赶上公交车</p></div><div class="card"><p class="jp">回数券</p><p class="romaji">Kaisuuken</p><p class="zh">次票/回数票</p></div><div class="card"><p class="jp">お先にどうぞ</p><p class="romaji">Osaki ni douzo</p><p class="zh">您先上车</p></div><div class="card"><p class="jp">揺れますのでご注意ください</p><p class="romaji">Yuremasu node gochuui kudasai</p><p class="zh">车辆晃动请注意</p></div><div class="card"><p class="jp">終点はどこですか？</p><p class="romaji">Shuuten wa doko desu ka?</p><p class="zh">终点站是哪里？</p></div><div class="card"><p class="jp">バス代はいくらですか？</p><p class="romaji">Basudai wa ikura desu ka?</p><p class="zh">公交车费多少钱？</p></div></div>
+    </div>
+    <div class="subsec">
+      <h3 class="subsec-title">タクシー（たくしー） <span class="subsec-zh">出租车</span> <span class="count">20条</span></h3>
+      <div class="grid"><div class="card"><p class="jp">タクシーを呼ぶ</p><p class="romaji">Takushii wo yobu</p><p class="zh">叫出租车</p></div><div class="card"><p class="jp">空車</p><p class="romaji">Kuusha</p><p class="zh">空车（可打车的标志）</p></div><div class="card"><p class="jp">〜まで行ってください</p><p class="romaji">~ made itte kudasai</p><p class="zh">请开到……</p></div><div class="card"><p class="jp">この住所までお願いします</p><p class="romaji">Kono juusho made onegaishimasu</p><p class="zh">请开到这个地址</p></div><div class="card"><p class="jp">急いでいます</p><p class="romaji">Isoide imasu</p><p class="zh">我赶时间</p></div><div class="card"><p class="jp">ここで停めてください</p><p class="romaji">Koko de tomete kudasai</p><p class="zh">请在这里停车</p></div><div class="card"><p class="jp">メーターを確認する</p><p class="romaji">Meetaa wo kakunin suru</p><p class="zh">确认计价器</p></div><div class="card"><p class="jp">いくらですか？</p><p class="romaji">Ikura desu ka?</p><p class="zh">多少钱？</p></div><div class="card"><p class="jp">お釣りは結構です</p><p class="romaji">Otsuri wa kekkou desu</p><p class="zh">不用找零了</p></div><div class="card"><p class="jp">トランクを開けてもらえますか</p><p class="romaji">Toranku wo akete moraemasu ka</p><p class="zh">可以帮我打开后备箱吗</p></div><div class="card"><p class="jp">道が混んでいますね</p><p class="romaji">Michi ga konde imasu ne</p><p class="zh">路上好堵啊</p></div><div class="card"><p class="jp">近道はありますか？</p><p class="romaji">Chikamichi wa arimasu ka?</p><p class="zh">有近路吗？</p></div><div class="card"><p class="jp">領収書をください</p><p class="romaji">Ryoushuusho wo kudasai</p><p class="zh">请给我发票</p></div><div class="card"><p class="jp">この辺りで大丈夫です</p><p class="romaji">Kono atari de daijoubu desu</p><p class="zh">这附近就可以了</p></div><div class="card"><p class="jp">カードで払えますか？</p><p class="romaji">Kaado de haraemasu ka?</p><p class="zh">可以刷卡付款吗？</p></div><div class="card"><p class="jp">配車アプリで呼ぶ</p><p class="romaji">Haisha apuri de yobu</p><p class="zh">用打车软件叫车</p></div><div class="card"><p class="jp">次の信号を右です</p><p class="romaji">Tsugi no shingou wo migi desu</p><p class="zh">下个红绿灯右转</p></div><div class="card"><p class="jp">そのまま真っ直ぐお願いします</p><p class="romaji">Sono mama massugu onegaishimasu</p><p class="zh">请一直往前直行</p></div><div class="card"><p class="jp">道に迷いました、助けてください</p><p class="romaji">Michi ni mayoimashita, tasukete kudasai</p><p class="zh">我迷路了，请帮帮我</p></div><div class="card"><p class="jp">ここで大丈夫ですか？</p><p class="romaji">Koko de daijoubu desu ka?</p><p class="zh">这里可以吗？（司机确认）</p></div></div>
+    </div>
+  </div>
+</section>
+<section class="part cat-shop" id="part-shop">
+  <div class="period-inner">
+    <div class="part-head">
+      <h2 class="part-jp">购物场景 · ショッピング</h2>
+      <p class="part-zh">从便利店到服装店退换货</p>
+    </div>
+    
+    <div class="subsec">
+      <h3 class="subsec-title">コンビニ・スーパー <span class="subsec-zh">便利店与超市</span> <span class="count">25条</span></h3>
+      <div class="grid"><div class="card"><p class="jp">いらっしゃいませ</p><p class="romaji">Irasshaimase</p><p class="zh">欢迎光临（店员招呼语）</p></div><div class="card"><p class="jp">袋は要りますか？</p><p class="romaji">Fukuro wa irimasu ka?</p><p class="zh">需要袋子吗？</p></div><div class="card"><p class="jp">袋はいりません</p><p class="romaji">Fukuro wa irimasen</p><p class="zh">不需要袋子</p></div><div class="card"><p class="jp">温めますか？</p><p class="romaji">Atatamemasu ka?</p><p class="zh">需要加热吗？</p></div><div class="card"><p class="jp">お箸をお付けしますか？</p><p class="romaji">Ohashi wo otsuke shimasu ka?</p><p class="zh">需要配筷子吗？</p></div><div class="card"><p class="jp">お会計、○○円になります</p><p class="romaji">Okaikei, ○○ en ni narimasu</p><p class="zh">一共○○日元</p></div><div class="card"><p class="jp">これは何ですか？</p><p class="romaji">Kore wa nan desu ka?</p><p class="zh">这是什么？</p></div><div class="card"><p class="jp">値段はいくらですか？</p><p class="romaji">Nedan wa ikura desu ka?</p><p class="zh">多少钱？</p></div><div class="card"><p class="jp">レジ袋</p><p class="romaji">Reji-bukuro</p><p class="zh">购物塑料袋</p></div><div class="card"><p class="jp">ポイントカードはお持ちですか？</p><p class="romaji">Pointo kaado wa omochi desu ka?</p><p class="zh">有积分卡吗？</p></div><div class="card"><p class="jp">お支払いは現金ですか、カードですか？</p><p class="romaji">Oshiharai wa genkin desu ka, kaado desu ka?</p><p class="zh">付现金还是刷卡？</p></div><div class="card"><p class="jp">PayPayで払えますか？</p><p class="romaji">PayPay de haraemasu ka?</p><p class="zh">可以用PayPay支付吗？</p></div><div class="card"><p class="jp">スーパーで買い物する</p><p class="romaji">Suupaa de kaimono suru</p><p class="zh">在超市购物</p></div><div class="card"><p class="jp">カゴを取る</p><p class="romaji">Kago wo toru</p><p class="zh">拿购物篮</p></div><div class="card"><p class="jp">カートを押す</p><p class="romaji">Kaato wo osu</p><p class="zh">推购物车</p></div><div class="card"><p class="jp">これは賞味期限がいつですか？</p><p class="romaji">Kore wa shoumi kigen ga itsu desu ka?</p><p class="zh">这个的保质期是什么时候？</p></div><div class="card"><p class="jp">試食してもいいですか？</p><p class="romaji">Shishoku shite mo ii desu ka?</p><p class="zh">可以试吃吗？</p></div><div class="card"><p class="jp">セール品</p><p class="romaji">Seeru-hin</p><p class="zh">特价商品</p></div><div class="card"><p class="jp">割引になります</p><p class="romaji">Waribiki ni narimasu</p><p class="zh">打折</p></div><div class="card"><p class="jp">在庫はありますか？</p><p class="romaji">Zaiko wa arimasu ka?</p><p class="zh">有货吗？</p></div><div class="card"><p class="jp">〜はどこにありますか？</p><p class="romaji">~ wa doko ni arimasu ka?</p><p class="zh">……在哪里？</p></div><div class="card"><p class="jp">お弁当を温めますか？</p><p class="romaji">Obentou wo atatamemasu ka?</p><p class="zh">便当需要加热吗？</p></div><div class="card"><p class="jp">お箸は何本お付けしますか？</p><p class="romaji">Ohashi wa nan-bon otsuke shimasu ka?</p><p class="zh">需要几双筷子？</p></div><div class="card"><p class="jp">ATMはありますか？</p><p class="romaji">ATM wa arimasu ka?</p><p class="zh">有自动取款机吗？</p></div><div class="card"><p class="jp">宅配便を出したいです</p><p class="romaji">Takuhaibin wo dashitai desu</p><p class="zh">我想寄快递</p></div></div>
+    </div>
+    <div class="subsec">
+      <h3 class="subsec-title">服・買い物 <span class="subsec-zh">服装购物</span> <span class="count">20条</span></h3>
+      <div class="grid"><div class="card"><p class="jp">試着してもいいですか？</p><p class="romaji">Shichaku shite mo ii desu ka?</p><p class="zh">可以试穿吗？</p></div><div class="card"><p class="jp">試着室はどこですか？</p><p class="romaji">Shichakushitsu wa doko desu ka?</p><p class="zh">试衣间在哪里？</p></div><div class="card"><p class="jp">サイズはありますか？</p><p class="romaji">Saizu wa arimasu ka?</p><p class="zh">有这个尺码吗？</p></div><div class="card"><p class="jp">もう少し大きいサイズはありますか？</p><p class="romaji">Mou sukoshi ookii saizu wa arimasu ka?</p><p class="zh">有再大一号的吗？</p></div><div class="card"><p class="jp">これは何色がありますか？</p><p class="romaji">Kore wa nani-iro ga arimasu ka?</p><p class="zh">这个有什么颜色？</p></div><div class="card"><p class="jp">色違いはありますか？</p><p class="romaji">Iro chigai wa arimasu ka?</p><p class="zh">有其他颜色吗？</p></div><div class="card"><p class="jp">これにします</p><p class="romaji">Kore ni shimasu</p><p class="zh">我要这个</p></div><div class="card"><p class="jp">似合いますか？</p><p class="romaji">Niaimasu ka?</p><p class="zh">适合我吗？</p></div><div class="card"><p class="jp">よくお似合いです</p><p class="romaji">Yoku oniai desu</p><p class="zh">很适合您（店员用语）</p></div><div class="card"><p class="jp">ちょっときついです</p><p class="romaji">Chotto kitsui desu</p><p class="zh">有点紧</p></div><div class="card"><p class="jp">ぶかぶかです</p><p class="romaji">Bukabuka desu</p><p class="zh">太宽松了</p></div><div class="card"><p class="jp">鏡はどこですか？</p><p class="romaji">Kagami wa doko desu ka?</p><p class="zh">镜子在哪里？</p></div><div class="card"><p class="jp">ラッピングできますか？</p><p class="romaji">Rappingu dekimasu ka?</p><p class="zh">可以包装吗？</p></div><div class="card"><p class="jp">プレゼント用です</p><p class="romaji">Purezento you desu</p><p class="zh">是要送人的礼物</p></div><div class="card"><p class="jp">これ一着だけありますか？</p><p class="romaji">Kore icchaku dake arimasu ka?</p><p class="zh">这件只剩一件了吗？</p></div><div class="card"><p class="jp">セール中ですか？</p><p class="romaji">Seeru-chuu desu ka?</p><p class="zh">在打折中吗？</p></div><div class="card"><p class="jp">免税できますか？</p><p class="romaji">Menzei dekimasu ka?</p><p class="zh">可以免税吗？</p></div><div class="card"><p class="jp">パスポートを見せる</p><p class="romaji">Pasupooto wo miseru</p><p class="zh">出示护照</p></div><div class="card"><p class="jp">これください</p><p class="romaji">Kore kudasai</p><p class="zh">请给我这个</p></div><div class="card"><p class="jp">他の店舗にありますか？</p><p class="romaji">Hoka no tenpo ni arimasu ka?</p><p class="zh">其他店铺有货吗？</p></div></div>
+    </div>
+    <div class="subsec">
+      <h3 class="subsec-title">値段交渉・返品交換 <span class="subsec-zh">议价、退货与换货</span> <span class="count">15条</span></h3>
+      <div class="grid"><div class="card"><p class="jp">これ、安くなりませんか？</p><p class="romaji">Kore, yasuku narimasen ka?</p><p class="zh">这个能便宜点吗？</p></div><div class="card"><p class="jp">もう少しまけてもらえますか？</p><p class="romaji">Mou sukoshi makete moraemasu ka?</p><p class="zh">能不能再便宜一点？</p></div><div class="card"><p class="jp">ちょっと考えます</p><p class="romaji">Chotto kangaemasu</p><p class="zh">我再考虑一下</p></div><div class="card"><p class="jp">また今度来ます</p><p class="romaji">Mata kondo kimasu</p><p class="zh">我下次再来</p></div><div class="card"><p class="jp">返品したいです</p><p class="romaji">Henpin shitai desu</p><p class="zh">我想退货</p></div><div class="card"><p class="jp">交換できますか？</p><p class="romaji">Koukan dekimasu ka?</p><p class="zh">可以换货吗？</p></div><div class="card"><p class="jp">レシートはありますか？</p><p class="romaji">Reshiito wa arimasu ka?</p><p class="zh">有小票吗？</p></div><div class="card"><p class="jp">レシートはこちらです</p><p class="romaji">Reshiito wa kochira desu</p><p class="zh">小票在这里</p></div><div class="card"><p class="jp">不良品でした</p><p class="romaji">Furyouhin deshita</p><p class="zh">是次品</p></div><div class="card"><p class="jp">サイズが合いませんでした</p><p class="romaji">Saizu ga aimasen deshita</p><p class="zh">尺码不合适</p></div><div class="card"><p class="jp">返金してもらえますか？</p><p class="romaji">Henkin shite moraemasu ka?</p><p class="zh">可以退款吗？</p></div><div class="card"><p class="jp">保証書はありますか？</p><p class="romaji">Hoshousho wa arimasu ka?</p><p class="zh">有保修卡吗？</p></div><div class="card"><p class="jp">包装紙は要りません</p><p class="romaji">Housoushi wa irimasen</p><p class="zh">不需要包装纸</p></div><div class="card"><p class="jp">会員登録をする</p><p class="romaji">Kaiin touroku wo suru</p><p class="zh">注册会员</p></div><div class="card"><p class="jp">クーポンを使う</p><p class="romaji">Kuupon wo tsukau</p><p class="zh">使用优惠券</p></div></div>
+    </div>
+    <div class="subsec">
+      <h3 class="subsec-title">ネットショッピング <span class="subsec-zh">网购与快递</span> <span class="count">15条</span></h3>
+      <div class="grid"><div class="card"><p class="jp">ネットで注文する</p><p class="romaji">Netto de chuumon suru</p><p class="zh">在网上下单</p></div><div class="card"><p class="jp">カートに入れる</p><p class="romaji">Kaato ni ireru</p><p class="zh">加入购物车</p></div><div class="card"><p class="jp">配送はいつですか？</p><p class="romaji">Haisou wa itsu desu ka?</p><p class="zh">什么时候发货？</p></div><div class="card"><p class="jp">送料はいくらですか？</p><p class="romaji">Souryou wa ikura desu ka?</p><p class="zh">运费多少钱？</p></div><div class="card"><p class="jp">在庫切れです</p><p class="romaji">Zaiko-gire desu</p><p class="zh">缺货了</p></div><div class="card"><p class="jp">レビューを見る</p><p class="romaji">Rebyuu wo miru</p><p class="zh">看评价</p></div><div class="card"><p class="jp">キャンセルしたいです</p><p class="romaji">Kyanseru shitai desu</p><p class="zh">我想取消订单</p></div><div class="card"><p class="jp">追跡番号を確認する</p><p class="romaji">Tsuiseki bangou wo kakunin suru</p><p class="zh">查询快递单号</p></div><div class="card"><p class="jp">荷物が届きました</p><p class="romaji">Nimotsu ga todokimashita</p><p class="zh">包裹到了</p></div><div class="card"><p class="jp">再配達を頼む</p><p class="romaji">Saihaitatsu wo tanomu</p><p class="zh">申请重新配送</p></div><div class="card"><p class="jp">置き配でお願いします</p><p class="romaji">Okihai de onegaishimasu</p><p class="zh">请放在门口（免接触配送）</p></div><div class="card"><p class="jp">支払い方法を選ぶ</p><p class="romaji">Shiharai houhou wo erabu</p><p class="zh">选择支付方式</p></div><div class="card"><p class="jp">代金引換</p><p class="romaji">Daikin hikikae</p><p class="zh">货到付款</p></div><div class="card"><p class="jp">セール中に買う</p><p class="romaji">Seeru-chuu ni kau</p><p class="zh">在打折时购买</p></div><div class="card"><p class="jp">ほしいものリストに追加する</p><p class="romaji">Hoshii mono risuto ni tsuika suru</p><p class="zh">加入心愿单</p></div></div>
+    </div>
+  </div>
+</section>
+<section class="part cat-food" id="part-food">
+  <div class="period-inner">
+    <div class="part-head">
+      <h2 class="part-jp">餐饮场景 · グルメ</h2>
+      <p class="part-zh">从正餐到咖啡厅、居酒屋</p>
+    </div>
+    
+    <div class="subsec">
+      <h3 class="subsec-title">レストラン <span class="subsec-zh">餐厅点餐</span> <span class="count">30条</span></h3>
+      <div class="grid"><div class="card"><p class="jp">何名様ですか？</p><p class="romaji">Nan-mei-sama desu ka?</p><p class="zh">请问几位？</p></div><div class="card"><p class="jp">二人です</p><p class="romaji">Futari desu</p><p class="zh">两位</p></div><div class="card"><p class="jp">禁煙席でお願いします</p><p class="romaji">Kin'enseki de onegaishimasu</p><p class="zh">请安排禁烟座位</p></div><div class="card"><p class="jp">メニューをください</p><p class="romaji">Menyuu wo kudasai</p><p class="zh">请给我菜单</p></div><div class="card"><p class="jp">おすすめは何ですか？</p><p class="romaji">Osusume wa nan desu ka?</p><p class="zh">有什么推荐的吗？</p></div><div class="card"><p class="jp">これは辛いですか？</p><p class="romaji">Kore wa karai desu ka?</p><p class="zh">这个辣吗？</p></div><div class="card"><p class="jp">アレルギーがあります</p><p class="romaji">Arerugii ga arimasu</p><p class="zh">我有过敏</p></div><div class="card"><p class="jp">注文をお願いします</p><p class="romaji">Chuumon wo onegaishimasu</p><p class="zh">我要点餐</p></div><div class="card"><p class="jp">これとこれをください</p><p class="romaji">Kore to kore wo kudasai</p><p class="zh">请给我这个和这个</p></div><div class="card"><p class="jp">同じものをください</p><p class="romaji">Onaji mono wo kudasai</p><p class="zh">我要一样的</p></div><div class="card"><p class="jp">以上でよろしいですか？</p><p class="romaji">Ijou de yoroshii desu ka?</p><p class="zh">这样可以吗（店员确认点单）</p></div><div class="card"><p class="jp">かしこまりました</p><p class="romaji">Kashikomarimashita</p><p class="zh">好的，明白了</p></div><div class="card"><p class="jp">お水をください</p><p class="romaji">Omizu wo kudasai</p><p class="zh">请给我水</p></div><div class="card"><p class="jp">すみません、これ頼んでいません</p><p class="romaji">Sumimasen, kore tanonde imasen</p><p class="zh">不好意思，这个我没点</p></div><div class="card"><p class="jp">まだ来ていません</p><p class="romaji">Mada kite imasen</p><p class="zh">还没上（菜）</p></div><div class="card"><p class="jp">少々お待ちください</p><p class="romaji">Shoushou omachi kudasai</p><p class="zh">请稍等</p></div><div class="card"><p class="jp">お待たせしました</p><p class="romaji">Omatase shimashita</p><p class="zh">让您久等了</p></div><div class="card"><p class="jp">追加で注文できますか？</p><p class="romaji">Tsuika de chuumon dekimasu ka?</p><p class="zh">可以加点吗？</p></div><div class="card"><p class="jp">とても美味しいです</p><p class="romaji">Totemo oishii desu</p><p class="zh">非常好吃</p></div><div class="card"><p class="jp">お会計お願いします</p><p class="romaji">Okaikei onegaishimasu</p><p class="zh">请结账</p></div><div class="card"><p class="jp">別々に払えますか？</p><p class="romaji">Betsubetsu ni haraemasu ka?</p><p class="zh">可以分开付款吗？</p></div><div class="card"><p class="jp">ご馳走様でした</p><p class="romaji">Gochisousama deshita</p><p class="zh">多谢款待（吃完说）</p></div><div class="card"><p class="jp">お持ち帰りできますか？</p><p class="romaji">Omochikaeri dekimasu ka?</p><p class="zh">可以打包吗？</p></div><div class="card"><p class="jp">食べ放題</p><p class="romaji">Tabehoudai</p><p class="zh">自助/无限量吃</p></div><div class="card"><p class="jp">飲み放題</p><p class="romaji">Nomihoudai</p><p class="zh">无限畅饮</p></div><div class="card"><p class="jp">辛さは調整できますか？</p><p class="romaji">Karasa wa chousei dekimasu ka?</p><p class="zh">辣度可以调整吗？</p></div><div class="card"><p class="jp">大盛りでお願いします</p><p class="romaji">Oomori de onegaishimasu</p><p class="zh">请给我大份</p></div><div class="card"><p class="jp">お子様用の椅子はありますか？</p><p class="romaji">Okosama-you no isu wa arimasu ka?</p><p class="zh">有儿童椅吗？</p></div><div class="card"><p class="jp">予約をしたいです</p><p class="romaji">Yoyaku wo shitai desu</p><p class="zh">我想预约</p></div><div class="card"><p class="jp">何時から開いていますか？</p><p class="romaji">Nanji kara aite imasu ka?</p><p class="zh">几点开始营业？</p></div></div>
+    </div>
+    <div class="subsec">
+      <h3 class="subsec-title">カフェ <span class="subsec-zh">咖啡厅</span> <span class="count">15条</span></h3>
+      <div class="grid"><div class="card"><p class="jp">ホットとアイス、どちらにしますか？</p><p class="romaji">Hotto to aisu, dochira ni shimasu ka?</p><p class="zh">要热的还是冰的？</p></div><div class="card"><p class="jp">アイスコーヒーをください</p><p class="romaji">Aisu koohii wo kudasai</p><p class="zh">请给我冰咖啡</p></div><div class="card"><p class="jp">ここで召し上がりますか？</p><p class="romaji">Koko de meshiagarimasu ka?</p><p class="zh">是在店内用吗？</p></div><div class="card"><p class="jp">持ち帰りでお願いします</p><p class="romaji">Mochikaeri de onegaishimasu</p><p class="zh">我要打包带走</p></div><div class="card"><p class="jp">店内でお願いします</p><p class="romaji">Tennai de onegaishimasu</p><p class="zh">我要在店里用</p></div><div class="card"><p class="jp">サイズはどうしますか？</p><p class="romaji">Saizu wa dou shimasu ka?</p><p class="zh">要什么尺寸？</p></div><div class="card"><p class="jp">ミルクは入れますか？</p><p class="romaji">Miruku wa iremasu ka?</p><p class="zh">要加牛奶吗？</p></div><div class="card"><p class="jp">砂糖はいりません</p><p class="romaji">Satou wa irimasen</p><p class="zh">不要加糖</p></div><div class="card"><p class="jp">Wi-Fiはありますか？</p><p class="romaji">Wi-Fi wa arimasu ka?</p><p class="zh">有Wi-Fi吗？</p></div><div class="card"><p class="jp">コンセントは使えますか？</p><p class="romaji">Konsento wa tsukaemasu ka?</p><p class="zh">可以用插座吗？</p></div><div class="card"><p class="jp">窓側の席がいいです</p><p class="romaji">Madogawa no seki ga ii desu</p><p class="zh">靠窗的座位比较好</p></div><div class="card"><p class="jp">お代わりできますか？</p><p class="romaji">Okawari dekimasu ka?</p><p class="zh">可以续杯吗？</p></div><div class="card"><p class="jp">ケーキも一つください</p><p class="romaji">Keeki mo hitotsu kudasai</p><p class="zh">再给我一份蛋糕</p></div><div class="card"><p class="jp">店内は静かですね</p><p class="romaji">Tennai wa shizuka desu ne</p><p class="zh">店里很安静呢</p></div><div class="card"><p class="jp">すみません、注文お願いします</p><p class="romaji">Sumimasen, chuumon onegaishimasu</p><p class="zh">不好意思，我要点单</p></div></div>
+    </div>
+    <div class="subsec">
+      <h3 class="subsec-title">居酒屋 <span class="subsec-zh">居酒屋小酌</span> <span class="count">15条</span></h3>
+      <div class="grid"><div class="card"><p class="jp">とりあえずビールで</p><p class="romaji">Toriaezu biiru de</p><p class="zh">先来杯啤酒吧</p></div><div class="card"><p class="jp">乾杯！</p><p class="romaji">Kanpai!</p><p class="zh">干杯！</p></div><div class="card"><p class="jp">お通し</p><p class="romaji">Otooshi</p><p class="zh">开胃小菜（居酒屋常见）</p></div><div class="card"><p class="jp">お酒に強いですか？</p><p class="romaji">Osake ni tsuyoi desu ka?</p><p class="zh">你酒量好吗？</p></div><div class="card"><p class="jp">お酒はあまり飲めません</p><p class="romaji">Osake wa amari nomemasen</p><p class="zh">我不太能喝酒</p></div><div class="card"><p class="jp">何にしますか？</p><p class="romaji">Nani ni shimasu ka?</p><p class="zh">要点什么？</p></div><div class="card"><p class="jp">この店の名物は何ですか？</p><p class="romaji">Kono mise no meibutsu wa nan desu ka?</p><p class="zh">这家店的招牌菜是什么？</p></div><div class="card"><p class="jp">串焼きを注文する</p><p class="romaji">Kushiyaki wo chuumon suru</p><p class="zh">点串烧</p></div><div class="card"><p class="jp">生ビールもう一杯</p><p class="romaji">Nama biiru mou ippai</p><p class="zh">再来一杯生啤</p></div><div class="card"><p class="jp">ちょっと酔った</p><p class="romaji">Chotto yotta</p><p class="zh">有点醉了</p></div><div class="card"><p class="jp">二次会に行こう</p><p class="romaji">Nijikai ni ikou</p><p class="zh">去续摊吧</p></div><div class="card"><p class="jp">割り勘にしよう</p><p class="romaji">Warikan ni shiyou</p><p class="zh">AA制吧</p></div><div class="card"><p class="jp">今日は奢るよ</p><p class="romaji">Kyou wa ogoru yo</p><p class="zh">今天我请客</p></div><div class="card"><p class="jp">お開きにしよう</p><p class="romaji">Ohiraki ni shiyou</p><p class="zh">散场吧（结束聚会）</p></div><div class="card"><p class="jp">楽しかった！</p><p class="romaji">Tanoshikatta!</p><p class="zh">今天玩得很开心！</p></div></div>
+    </div>
+  </div>
+</section>
+<section class="part cat-errand" id="part-errand">
+  <div class="period-inner">
+    <div class="part-head">
+      <h2 class="part-jp">日常办事 · 用事</h2>
+      <p class="part-zh">医院、银行、理发店</p>
+    </div>
+    
+    <div class="subsec">
+      <h3 class="subsec-title">病院・薬局 <span class="subsec-zh">医院与药店</span> <span class="count">25条</span></h3>
+      <div class="grid"><div class="card"><p class="jp">具合が悪いです</p><p class="romaji">Guai ga warui desu</p><p class="zh">身体不舒服</p></div><div class="card"><p class="jp">熱があります</p><p class="romaji">Netsu ga arimasu</p><p class="zh">发烧了</p></div><div class="card"><p class="jp">頭が痛いです</p><p class="romaji">Atama ga itai desu</p><p class="zh">头疼</p></div><div class="card"><p class="jp">お腹が痛いです</p><p class="romaji">Onaka ga itai desu</p><p class="zh">肚子疼</p></div><div class="card"><p class="jp">咳が出ます</p><p class="romaji">Seki ga demasu</p><p class="zh">咳嗽</p></div><div class="card"><p class="jp">喉が痛いです</p><p class="romaji">Nodo ga itai desu</p><p class="zh">嗓子疼</p></div><div class="card"><p class="jp">薬をください</p><p class="romaji">Kusuri wo kudasai</p><p class="zh">请给我药</p></div><div class="card"><p class="jp">保険証をお持ちですか？</p><p class="romaji">Hokenshou wo omochi desu ka?</p><p class="zh">带保险证了吗？</p></div><div class="card"><p class="jp">初診ですか？</p><p class="romaji">Shoshin desu ka?</p><p class="zh">是第一次来看病吗？</p></div><div class="card"><p class="jp">予約していますか？</p><p class="romaji">Yoyaku shite imasu ka?</p><p class="zh">有预约吗？</p></div><div class="card"><p class="jp">どうされましたか？</p><p class="romaji">Dou saremashita ka?</p><p class="zh">您怎么了？（医生问诊）</p></div><div class="card"><p class="jp">いつからですか？</p><p class="romaji">Itsu kara desu ka?</p><p class="zh">从什么时候开始的？</p></div><div class="card"><p class="jp">薬アレルギーはありますか？</p><p class="romaji">Kusuri arerugii wa arimasu ka?</p><p class="zh">对药物过敏吗？</p></div><div class="card"><p class="jp">お大事に</p><p class="romaji">Odaiji ni</p><p class="zh">请多保重（问诊结束常用语）</p></div><div class="card"><p class="jp">この薬は一日三回です</p><p class="romaji">Kono kusuri wa ichinichi san-kai desu</p><p class="zh">这个药一天三次</p></div><div class="card"><p class="jp">食後に飲んでください</p><p class="romaji">Shokugo ni nonde kudasai</p><p class="zh">请饭后服用</p></div><div class="card"><p class="jp">処方箋をください</p><p class="romaji">Shohousen wo kudasai</p><p class="zh">请给我处方</p></div><div class="card"><p class="jp">薬局はどこですか？</p><p class="romaji">Yakkyoku wa doko desu ka?</p><p class="zh">药店在哪里？</p></div><div class="card"><p class="jp">痛み止めをください</p><p class="romaji">Itamidome wo kudasai</p><p class="zh">请给我止痛药</p></div><div class="card"><p class="jp">絆創膏はありますか？</p><p class="romaji">Bansoukou wa arimasu ka?</p><p class="zh">有创可贴吗？</p></div><div class="card"><p class="jp">風邪をひきました</p><p class="romaji">Kaze wo hikimashita</p><p class="zh">感冒了</p></div><div class="card"><p class="jp">休みをもらえますか？</p><p class="romaji">Yasumi wo moraemasu ka?</p><p class="zh">可以请假吗？</p></div><div class="card"><p class="jp">診断書をください</p><p class="romaji">Shindansho wo kudasai</p><p class="zh">请给我诊断证明</p></div><div class="card"><p class="jp">大丈夫ですか？</p><p class="romaji">Daijoubu desu ka?</p><p class="zh">你没事吧？</p></div><div class="card"><p class="jp">救急車を呼んでください</p><p class="romaji">Kyuukyuusha wo yonde kudasai</p><p class="zh">请叫救护车</p></div></div>
+    </div>
+    <div class="subsec">
+      <h3 class="subsec-title">銀行・郵便局 <span class="subsec-zh">银行与邮局</span> <span class="count">20条</span></h3>
+      <div class="grid"><div class="card"><p class="jp">口座を開きたいです</p><p class="romaji">Kouza wo hirakitai desu</p><p class="zh">我想开户</p></div><div class="card"><p class="jp">お金を下ろす</p><p class="romaji">Okane wo orosu</p><p class="zh">取钱</p></div><div class="card"><p class="jp">お金を預ける</p><p class="romaji">Okane wo azukeru</p><p class="zh">存钱</p></div><div class="card"><p class="jp">振り込みたいです</p><p class="romaji">Furikomitai desu</p><p class="zh">我想转账</p></div><div class="card"><p class="jp">通帳をください</p><p class="romaji">Tsuuchou wo kudasai</p><p class="zh">请给我存折</p></div><div class="card"><p class="jp">暗証番号を入力してください</p><p class="romaji">Anshou bangou wo nyuuryoku shite kudasai</p><p class="zh">请输入密码</p></div><div class="card"><p class="jp">手数料はいくらですか？</p><p class="romaji">Tesuuryou wa ikura desu ka?</p><p class="zh">手续费多少钱？</p></div><div class="card"><p class="jp">両替できますか？</p><p class="romaji">Ryougae dekimasu ka?</p><p class="zh">可以换汇吗？</p></div><div class="card"><p class="jp">これを送りたいです</p><p class="romaji">Kore wo okuritai desu</p><p class="zh">我想寄送这个</p></div><div class="card"><p class="jp">郵便局はどこですか？</p><p class="romaji">Yuubinkyoku wa doko desu ka?</p><p class="zh">邮局在哪里？</p></div><div class="card"><p class="jp">切手をください</p><p class="romaji">Kitte wo kudasai</p><p class="zh">请给我邮票</p></div><div class="card"><p class="jp">速達でお願いします</p><p class="romaji">Sokutatsu de onegaishimasu</p><p class="zh">请用快递方式</p></div><div class="card"><p class="jp">国際便で送りたいです</p><p class="romaji">Kokusaibin de okuritai desu</p><p class="zh">我想用国际邮件寄送</p></div><div class="card"><p class="jp">何日くらいで届きますか？</p><p class="romaji">Nan-nichi kurai de todokimasu ka?</p><p class="zh">大概几天能到？</p></div><div class="card"><p class="jp">荷物を受け取る</p><p class="romaji">Nimotsu wo uketoru</p><p class="zh">收快递/包裹</p></div><div class="card"><p class="jp">サインをお願いします</p><p class="romaji">Sain wo onegaishimasu</p><p class="zh">请签名</p></div><div class="card"><p class="jp">印鑑をお持ちですか？</p><p class="romaji">Inkan wo omochi desu ka?</p><p class="zh">带印章了吗？</p></div><div class="card"><p class="jp">身分証明書を見せてください</p><p class="romaji">Mibun shoumeisho wo misete kudasai</p><p class="zh">请出示身份证明</p></div><div class="card"><p class="jp">再配達をお願いしたいです</p><p class="romaji">Saihaitatsu wo onegai shitai desu</p><p class="zh">我想申请重新配送</p></div><div class="card"><p class="jp">窓口はどこですか？</p><p class="romaji">Madoguchi wa doko desu ka?</p><p class="zh">窗口在哪里？</p></div></div>
+    </div>
+    <div class="subsec">
+      <h3 class="subsec-title">美容院 <span class="subsec-zh">理发店</span> <span class="count">15条</span></h3>
+      <div class="grid"><div class="card"><p class="jp">カットをお願いします</p><p class="romaji">Katto wo onegaishimasu</p><p class="zh">我要剪发</p></div><div class="card"><p class="jp">どのくらい切りますか？</p><p class="romaji">Dono kurai kirimasu ka?</p><p class="zh">要剪多短？</p></div><div class="card"><p class="jp">少しだけ切ってください</p><p class="romaji">Sukoshi dake kitte kudasai</p><p class="zh">只剪一点点就好</p></div><div class="card"><p class="jp">前髪を切ってください</p><p class="romaji">Maegami wo kitte kudasai</p><p class="zh">请剪一下刘海</p></div><div class="card"><p class="jp">パーマをかけたいです</p><p class="romaji">Paama wo kaketai desu</p><p class="zh">我想烫发</p></div><div class="card"><p class="jp">カラーもお願いします</p><p class="romaji">Karaa mo onegaishimasu</p><p class="zh">也想染个发</p></div><div class="card"><p class="jp">この写真みたいにしたいです</p><p class="romaji">Kono shashin mitai ni shitai desu</p><p class="zh">想剪成照片这样的</p></div><div class="card"><p class="jp">シャンプーします</p><p class="romaji">Shanpuu shimasu</p><p class="zh">洗一下头</p></div><div class="card"><p class="jp">かゆいところはありますか？</p><p class="romaji">Kayui tokoro wa arimasu ka?</p><p class="zh">有痒的地方吗？</p></div><div class="card"><p class="jp">お湯加減はいかがですか？</p><p class="romaji">Oyu kagen wa ikaga desu ka?</p><p class="zh">水温怎么样？</p></div><div class="card"><p class="jp">こんな感じでよろしいですか？</p><p class="romaji">Konna kanji de yoroshii desu ka?</p><p class="zh">这样可以吗？</p></div><div class="card"><p class="jp">いい感じです</p><p class="romaji">Ii kanji desu</p><p class="zh">感觉不错</p></div><div class="card"><p class="jp">料金はいくらですか？</p><p class="romaji">Ryoukin wa ikura desu ka?</p><p class="zh">费用多少钱？</p></div><div class="card"><p class="jp">次の予約をしたいです</p><p class="romaji">Tsugi no yoyaku wo shitai desu</p><p class="zh">我想预约下一次</p></div><div class="card"><p class="jp">ありがとうございました</p><p class="romaji">Arigatou gozaimashita</p><p class="zh">谢谢您</p></div></div>
+    </div>
+  </div>
+</section>
+<section class="part cat-social" id="part-social">
+  <div class="period-inner">
+    <div class="part-head">
+      <h2 class="part-jp">社交沟通 · コミュニケーション</h2>
+      <p class="part-zh">打电话、寒暄与周末社交</p>
+    </div>
+    
+    <div class="subsec">
+      <h3 class="subsec-title">電話 <span class="subsec-zh">打电话</span> <span class="count">20条</span></h3>
+      <div class="grid"><div class="card"><p class="jp">もしもし</p><p class="romaji">Moshi moshi</p><p class="zh">喂（打电话专用问候语）</p></div><div class="card"><p class="jp">〜さんはいらっしゃいますか？</p><p class="romaji">~ san wa irasshaimasu ka?</p><p class="zh">请问……在吗？</p></div><div class="card"><p class="jp">少々お待ちください</p><p class="romaji">Shoushou omachi kudasai</p><p class="zh">请稍等</p></div><div class="card"><p class="jp">今、大丈夫ですか？</p><p class="romaji">Ima, daijoubu desu ka?</p><p class="zh">现在方便说话吗？</p></div><div class="card"><p class="jp">後でかけ直します</p><p class="romaji">Ato de kakenaoshimasu</p><p class="zh">我稍后再打给您</p></div><div class="card"><p class="jp">電波が悪いです</p><p class="romaji">Denpa ga warui desu</p><p class="zh">信号不好</p></div><div class="card"><p class="jp">聞こえますか？</p><p class="romaji">Kikoemasu ka?</p><p class="zh">能听见吗？</p></div><div class="card"><p class="jp">もう一度言ってください</p><p class="romaji">Mou ichido itte kudasai</p><p class="zh">请再说一遍</p></div><div class="card"><p class="jp">失礼します</p><p class="romaji">Shitsurei shimasu</p><p class="zh">（挂电话前）失陪了</p></div><div class="card"><p class="jp">伝言をお願いできますか？</p><p class="romaji">Dengon wo onegai dekimasu ka?</p><p class="zh">可以帮忙留言吗？</p></div><div class="card"><p class="jp">折り返しお電話します</p><p class="romaji">Orikaeshi odenwa shimasu</p><p class="zh">我会回电给您</p></div><div class="card"><p class="jp">番号を教えてもらえますか？</p><p class="romaji">Bangou wo oshiete moraemasu ka?</p><p class="zh">能告诉我号码吗？</p></div><div class="card"><p class="jp">留守番電話にメッセージを残す</p><p class="romaji">Rusuban denwa ni messeeji wo nokosu</p><p class="zh">在语音信箱留言</p></div><div class="card"><p class="jp">LINEで送ります</p><p class="romaji">LINE de okurimasu</p><p class="zh">我用LINE发给你</p></div><div class="card"><p class="jp">既読スルーされた</p><p class="romaji">Kidoku suruu sareta</p><p class="zh">被已读不回了</p></div><div class="card"><p class="jp">既読になった</p><p class="romaji">Kidoku ni natta</p><p class="zh">变成已读了</p></div><div class="card"><p class="jp">返信が遅くてすみません</p><p class="romaji">Henshin ga osokute sumimasen</p><p class="zh">抱歉回复晚了</p></div><div class="card"><p class="jp">スタンプを送る</p><p class="romaji">Sutanpu wo okuru</p><p class="zh">发送表情包/贴图</p></div><div class="card"><p class="jp">グループに追加する</p><p class="romaji">Guruupu ni tsuika suru</p><p class="zh">加进群组</p></div><div class="card"><p class="jp">通話できますか？</p><p class="romaji">Tsuuwa dekimasu ka?</p><p class="zh">可以语音通话吗？</p></div></div>
+    </div>
+    <div class="subsec">
+      <h3 class="subsec-title">天気・あいさつ <span class="subsec-zh">天气与日常寒暄</span> <span class="count">20条</span></h3>
+      <div class="grid"><div class="card"><p class="jp">今日はいい天気ですね</p><p class="romaji">Kyou wa ii tenki desu ne</p><p class="zh">今天天气真好呢</p></div><div class="card"><p class="jp">暑いですね</p><p class="romaji">Atsui desu ne</p><p class="zh">好热啊</p></div><div class="card"><p class="jp">寒くなりましたね</p><p class="romaji">Samuku narimashita ne</p><p class="zh">变冷了呢</p></div><div class="card"><p class="jp">明日は雨が降るそうです</p><p class="romaji">Ashita wa ame ga furu sou desu</p><p class="zh">听说明天会下雨</p></div><div class="card"><p class="jp">傘を持って行った方がいいですよ</p><p class="romaji">Kasa wo motte itta hou ga ii desu yo</p><p class="zh">最好带把伞去</p></div><div class="card"><p class="jp">最近どうですか？</p><p class="romaji">Saikin dou desu ka?</p><p class="zh">最近怎么样？</p></div><div class="card"><p class="jp">お元気ですか？</p><p class="romaji">Ogenki desu ka?</p><p class="zh">您还好吗？</p></div><div class="card"><p class="jp">おかげさまで元気です</p><p class="romaji">Okagesama de genki desu</p><p class="zh">托您的福，我很好</p></div><div class="card"><p class="jp">お久しぶりです</p><p class="romaji">Ohisashiburi desu</p><p class="zh">好久不见</p></div><div class="card"><p class="jp">初めまして</p><p class="romaji">Hajimemashite</p><p class="zh">初次见面</p></div><div class="card"><p class="jp">よろしくお願いします</p><p class="romaji">Yoroshiku onegaishimasu</p><p class="zh">请多关照</p></div><div class="card"><p class="jp">失礼ですが、お名前は？</p><p class="romaji">Shitsurei desu ga, onamae wa?</p><p class="zh">不好意思，请问您贵姓？</p></div><div class="card"><p class="jp">こちらこそ</p><p class="romaji">Kochirakoso</p><p class="zh">彼此彼此/我也是</p></div><div class="card"><p class="jp">お仕事は何をされていますか？</p><p class="romaji">Oshigoto wa nani wo sarete imasu ka?</p><p class="zh">您是做什么工作的？</p></div><div class="card"><p class="jp">休みの日は何をしますか？</p><p class="romaji">Yasumi no hi wa nani wo shimasu ka?</p><p class="zh">休息日一般做什么？</p></div><div class="card"><p class="jp">実は…</p><p class="romaji">Jitsu wa…</p><p class="zh">其实……</p></div><div class="card"><p class="jp">そうなんですね</p><p class="romaji">Sou nan desu ne</p><p class="zh">原来是这样啊</p></div><div class="card"><p class="jp">なるほど</p><p class="romaji">Naruhodo</p><p class="zh">原来如此</p></div><div class="card"><p class="jp">お先に失礼します</p><p class="romaji">Osaki ni shitsurei shimasu</p><p class="zh">我先告辞了</p></div><div class="card"><p class="jp">気をつけて</p><p class="romaji">Ki wo tsukete</p><p class="zh">路上小心</p></div></div>
+    </div>
+    <div class="subsec">
+      <h3 class="subsec-title">週末・友達と <span class="subsec-zh">周末与朋友社交</span> <span class="count">20条</span></h3>
+      <div class="grid"><div class="card"><p class="jp">今度の週末、暇？</p><p class="romaji">Kondo no shuumatsu, hima?</p><p class="zh">这个周末有空吗？</p></div><div class="card"><p class="jp">映画を見に行かない？</p><p class="romaji">Eiga wo mi ni ikanai?</p><p class="zh">要不要去看电影？</p></div><div class="card"><p class="jp">何時に集合する？</p><p class="romaji">Nanji ni shuugou suru?</p><p class="zh">几点集合？</p></div><div class="card"><p class="jp">チケットを予約する</p><p class="romaji">Chiketto wo yoyaku suru</p><p class="zh">预订票</p></div><div class="card"><p class="jp">何時の回にする？</p><p class="romaji">Nanji no kai ni suru?</p><p class="zh">要看几点的场次？</p></div><div class="card"><p class="jp">ポップコーンを買う</p><p class="romaji">Poppukoon wo kau</p><p class="zh">买爆米花</p></div><div class="card"><p class="jp">面白かった！</p><p class="romaji">Omoshirokatta!</p><p class="zh">真好看/真有意思！</p></div><div class="card"><p class="jp">感動した</p><p class="romaji">Kandou shita</p><p class="zh">很感动</p></div><div class="card"><p class="jp">カラオケに行こう</p><p class="romaji">Karaoke ni ikou</p><p class="zh">去唱卡拉OK吧</p></div><div class="card"><p class="jp">何か予定ある？</p><p class="romaji">Nanika yotei aru?</p><p class="zh">有什么安排吗？</p></div><div class="card"><p class="jp">特に予定はない</p><p class="romaji">Tokuni yotei wa nai</p><p class="zh">没什么特别的安排</p></div><div class="card"><p class="jp">久しぶりに集まろう</p><p class="romaji">Hisashiburi ni atsumarou</p><p class="zh">好久没聚了，聚一下吧</p></div><div class="card"><p class="jp">楽しみにしています</p><p class="romaji">Tanoshimi ni shite imasu</p><p class="zh">很期待</p></div><div class="card"><p class="jp">また誘ってね</p><p class="romaji">Mata sasotte ne</p><p class="zh">下次再约我啊</p></div><div class="card"><p class="jp">今度奢るね</p><p class="romaji">Kondo ogaru ne</p><p class="zh">下次我请客</p></div><div class="card"><p class="jp">公園を散歩する</p><p class="romaji">Kouen wo sanpo suru</p><p class="zh">在公园散步</p></div><div class="card"><p class="jp">ジムに行く</p><p class="romaji">Jimu ni iku</p><p class="zh">去健身房</p></div><div class="card"><p class="jp">運動不足だな</p><p class="romaji">Undou busoku da na</p><p class="zh">运动不足啊</p></div><div class="card"><p class="jp">写真を撮ろう</p><p class="romaji">Shashin wo torou</p><p class="zh">来拍张照吧</p></div><div class="card"><p class="jp">インスタに投稿する</p><p class="romaji">Insuta ni toukou suru</p><p class="zh">发到Instagram上</p></div></div>
+    </div>
+  </div>
+</section>
+<section class="part cat-emg" id="part-emg">
+  <div class="period-inner">
+    <div class="part-head">
+      <h2 class="part-jp">应急场景 · 緊急時</h2>
+      <p class="part-zh">问路、求助与突发状况</p>
+    </div>
+    
+    <div class="subsec">
+      <h3 class="subsec-title">道に迷った時・助けが必要な時 <span class="subsec-zh">问路与求助</span> <span class="count">25条</span></h3>
+      <div class="grid"><div class="card"><p class="jp">すみません、道に迷いました</p><p class="romaji">Sumimasen, michi ni mayoimashita</p><p class="zh">不好意思，我迷路了</p></div><div class="card"><p class="jp">〜へ行きたいのですが</p><p class="romaji">~ e ikitai no desu ga</p><p class="zh">我想去……</p></div><div class="card"><p class="jp">ここはどこですか？</p><p class="romaji">Koko wa doko desu ka?</p><p class="zh">这里是哪里？</p></div><div class="card"><p class="jp">地図を見せてもらえますか？</p><p class="romaji">Chizu wo misete moraemasu ka?</p><p class="zh">可以给我看下地图吗？</p></div><div class="card"><p class="jp">歩いてどのくらいかかりますか？</p><p class="romaji">Aruite dono kurai kakarimasu ka?</p><p class="zh">走路大概要多久？</p></div><div class="card"><p class="jp">まっすぐ行ってください</p><p class="romaji">Massugu itte kudasai</p><p class="zh">请一直往前走</p></div><div class="card"><p class="jp">右に曲がってください</p><p class="romaji">Migi ni magatte kudasai</p><p class="zh">请向右转</p></div><div class="card"><p class="jp">左に曲がってください</p><p class="romaji">Hidari ni magatte kudasai</p><p class="zh">请向左转</p></div><div class="card"><p class="jp">この近くにコンビニはありますか？</p><p class="romaji">Kono chikaku ni konbini wa arimasu ka?</p><p class="zh">这附近有便利店吗？</p></div><div class="card"><p class="jp">トイレはどこですか？</p><p class="romaji">Toire wa doko desu ka?</p><p class="zh">洗手间在哪里？</p></div><div class="card"><p class="jp">財布を落としました</p><p class="romaji">Saifu wo otoshimashita</p><p class="zh">我的钱包丢了</p></div><div class="card"><p class="jp">携帯をなくしました</p><p class="romaji">Keitai wo nakushimashita</p><p class="zh">我的手机丢了</p></div><div class="card"><p class="jp">交番はどこですか？</p><p class="romaji">Kouban wa doko desu ka?</p><p class="zh">派出所在哪里？</p></div><div class="card"><p class="jp">助けてください！</p><p class="romaji">Tasukete kudasai!</p><p class="zh">请帮帮我！</p></div><div class="card"><p class="jp">警察を呼んでください</p><p class="romaji">Keisatsu wo yonde kudasai</p><p class="zh">请叫警察</p></div><div class="card"><p class="jp">日本語が話せません</p><p class="romaji">Nihongo ga hanasemasen</p><p class="zh">我不会说日语</p></div><div class="card"><p class="jp">英語を話せますか？</p><p class="romaji">Eigo wo hanasemasu ka?</p><p class="zh">您会说英语吗？</p></div><div class="card"><p class="jp">ゆっくり話してもらえますか？</p><p class="romaji">Yukkuri hanashite moraemasu ka?</p><p class="zh">可以说慢一点吗？</p></div><div class="card"><p class="jp">もう一度お願いします</p><p class="romaji">Mou ichido onegaishimasu</p><p class="zh">请再说一次</p></div><div class="card"><p class="jp">書いてもらえますか？</p><p class="romaji">Kaite moraemasu ka?</p><p class="zh">可以写下来给我看吗？</p></div><div class="card"><p class="jp">地震です！</p><p class="romaji">Jishin desu!</p><p class="zh">地震了！</p></div><div class="card"><p class="jp">落ち着いてください</p><p class="romaji">Ochitsuite kudasai</p><p class="zh">请冷静</p></div><div class="card"><p class="jp">避難してください</p><p class="romaji">Hinan shite kudasai</p><p class="zh">请避难/请撤离</p></div><div class="card"><p class="jp">非常口はどこですか？</p><p class="romaji">Hijouguchi wa doko desu ka?</p><p class="zh">紧急出口在哪里？</p></div><div class="card"><p class="jp">大丈夫です、心配しないで</p><p class="romaji">Daijoubu desu, shinpai shinaide</p><p class="zh">没事的，别担心</p></div></div>
+    </div>
+  </div>
+</section>
+<footer>
+  <div class="moon"></div>
+  <div><strong>一日の日本語</strong> · 从 <strong>おはよう</strong> 到 <strong>おやすみ</strong>，从家门到街头</div>
+  <div>把这26个场景、513条短语，过成你每天的日语练习 · がんばって！</div>
+</footer>
+
+<script>
+  // 侧边时间轴：随滚动位置移动圆点，仅在"时间线"区域显示
+  const sections = Array.from(document.querySelectorAll('.period'));
+  const marker = document.getElementById('trackMarker');
+  const label = document.getElementById('trackLabel');
+  const rail = document.querySelector('.daytrack .rail');
+  const daytrack = document.getElementById('daytrack');
+  const dividerEl = document.querySelector('.divider');
+
+  function updateTrack(){
+    if(!rail) return;
+    const railHeight = rail.offsetHeight;
+    const viewMid = window.innerHeight/2;
+
+    // 判断是否仍在时间线区域内（分界线之前）
+    if(dividerEl){
+      const dRect = dividerEl.getBoundingClientRect();
+      if(dRect.top < viewMid){
+        daytrack.style.opacity = '0';
+        daytrack.style.pointerEvents = 'none';
+        return;
+      } else {
+        daytrack.style.opacity = '1';
+        daytrack.style.pointerEvents = 'auto';
+      }
+    }
+
+    let current = sections[0];
+    let progress = 0;
+    for(let i=0;i<sections.length;i++){
+      const rect = sections[i].getBoundingClientRect();
+      if(rect.top <= viewMid){
+        current = sections[i];
+        progress = i/(sections.length-1);
+      }
+    }
+    marker.style.top = (progress*railHeight)+'px';
+    label.textContent = current.dataset.time;
+  }
+  window.addEventListener('scroll', updateTrack, {passive:true});
+  window.addEventListener('resize', updateTrack);
+  updateTrack();
+</script>
+
+</body>
+</html>
