@@ -652,36 +652,40 @@
 </script>
 
 <script>
-  // ============ 点击发音（Web Speech API，含移动端兼容修复） ============
+  // ============ 点击发音：优先在线真人语音，浏览器TTS作为增强 ============
+  // 说明：Android 系统 WebView（很多国产壳浏览器，如 Via、UC、QQ浏览器、
+  // 小米浏览器等底层用的都是它）普遍没有实现 speechSynthesis 接口，
+  // 这不是能靠 JS 绕过的 bug，而是这类内核压根不提供这个能力。
+  // 因此这里把「在线获取一段现成日语语音音频再用 <audio> 播放」作为
+  // 主要方案（几乎所有浏览器都支持 <audio>），有 speechSynthesis 的
+  // 浏览器则可以额外享受到本地合成语音、无需联网的体验。
   (function(){
     const SPEAK_ICON_SVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3z"/><path d="M16.5 12c0-1.77-.77-3.29-2-4.2v8.4c1.23-.91 2-2.43 2-4.2z" opacity="0.85"/><path d="M14.5 4.6v1.9c2.89 1.02 5 3.77 5 5.5s-2.11 4.48-5 5.5v1.9c3.89-1.19 6.5-4.16 6.5-7.4s-2.61-6.21-6.5-7.4z" opacity="0.6"/></svg>';
 
-    const supported = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
     const banner = document.getElementById('ttsBanner');
+    const nativeSupported = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
     let slowMode = false;
     let currentCard = null;
     let jaVoice = null;
     let voicesReady = false;
-    // 关键修复1：某些移动端浏览器（尤其 iOS Safari）在朗读开始前会把 utterance
-    // 对象垃圾回收，导致朗读“静默失败”。用一个模块级变量长期持有引用即可避免。
     let livingUtterance = null;
-    let unlocked = false;
+    let nativeFailedOnce = false; // 本地合成一旦确认不出声，之后直接走在线音频，不再等待超时
     let watchdogTimer = null;
 
     const ua = navigator.userAgent || '';
-    const isInApp = /MicroMessenger|QQ\/|Weibo|AlipayClient|DingTalk|ByteDance|musical_ly|Line\/|FBAN|FBAV/i.test(ua);
+    const isInApp = /MicroMessenger|QQ\/|Weibo|AlipayClient|DingTalk|ByteDance|musical_ly|Line\//i.test(ua);
 
     function showBanner(msg, ms){
       if(!banner) return;
       banner.textContent = msg;
       banner.classList.add('show');
       clearTimeout(banner._t);
-      banner._t = setTimeout(()=>banner.classList.remove('show'), ms || 3200);
+      banner._t = setTimeout(()=>banner.classList.remove('show'), ms || 3000);
     }
 
-    // ---- 语音列表加载：移动端常常需要等一小会儿甚至需要用户先交互一次 ----
+    // ---- 本地语音合成：语音列表加载 ----
     function pickJaVoice(){
-      if(!supported) return;
+      if(!nativeSupported) return;
       const voices = window.speechSynthesis.getVoices();
       if(voices && voices.length){
         voicesReady = true;
@@ -695,18 +699,16 @@
       if(voicesReady || retries <= 0) return;
       setTimeout(()=>pollVoicesUntilReady(retries - 1), 300);
     }
-    if(supported){
+    if(nativeSupported){
       pickJaVoice();
       window.speechSynthesis.onvoiceschanged = pickJaVoice;
-      pollVoicesUntilReady(8); // 最多轮询约2.4秒，兼容加载较慢的安卓机型
+      pollVoicesUntilReady(8);
     }
 
-    // ---- 关键修复2：首次用户交互时“热身”一次语音引擎 ----
-    // iOS / 部分安卓浏览器要求语音合成必须发生在用户手势的调用栈内，
-    // 且第一次调用容易失败。这里在用户第一次点击页面任意位置时，
-    // 预先 speak 一个空白/极短内容并立即 cancel，把引擎“唤醒”。
+    // ---- 首次交互热身本地引擎（有的话）----
+    let unlocked = false;
     function unlockSpeechOnce(){
-      if(unlocked || !supported) return;
+      if(unlocked || !nativeSupported) return;
       unlocked = true;
       try{
         const warm = new SpeechSynthesisUtterance('.');
@@ -714,47 +716,93 @@
         warm.lang = 'ja-JP';
         window.speechSynthesis.speak(warm);
         setTimeout(()=>window.speechSynthesis.cancel(), 60);
-      }catch(e){ /* 忽略热身失败，不影响后续正常朗读尝试 */ }
+      }catch(e){}
     }
     document.addEventListener('touchend', unlockSpeechOnce, {once:true, passive:true});
     document.addEventListener('click', unlockSpeechOnce, {once:true});
 
     if(isInApp){
-      // 微信/QQ/微博等内置浏览器普遍屏蔽或阉割了语音合成能力
-      showBanner('检测到当前可能在App内置浏览器中打开，朗读功能受限。建议点右上角菜单选择"在浏览器中打开"', 5000);
+      showBanner('检测到可能在App内置浏览器中打开，若无法播放请用系统浏览器打开本页', 5000);
     }
 
+    // ---- 共享的 <audio> 元素，用于在线语音播放 ----
+    const sharedAudio = new Audio();
+    sharedAudio.preload = 'none';
+    let audioCardMap = new WeakMap(); // 记录当前 audio 对应的卡片
+
     function clearPlaying(){
-      if(currentCard){ currentCard.classList.remove('is-playing'); }
+      if(currentCard){
+        currentCard.classList.remove('is-playing');
+        currentCard.classList.remove('is-loading');
+      }
       currentCard = null;
       clearTimeout(watchdogTimer);
     }
 
-    function speakCard(card){
-      const jpEl = card.querySelector('.jp');
-      if(!jpEl) return;
-      const text = jpEl.textContent.trim();
-      if(!text) return;
+    // 在线语音源：优先有道词典发音接口（国内可直接访问，无需科学上网），
+    // 如果失败再退回 Google 翻译语音接口作为补充线路
+    function onlineUrls(text){
+      const q = encodeURIComponent(text);
+      return [
+        'https://dict.youdao.com/dictvoice?audio=' + q + '&le=jap',
+        'https://translate.google.com/translate_tts?ie=UTF-8&q=' + q + '&tl=ja&client=tw-ob'
+      ];
+    }
 
-      if(!supported){
-        showBanner('你的浏览器不支持语音朗读，换新版 Safari / Chrome 试试吧');
+    function speakOnline(text, card, urlIndex){
+      const urls = onlineUrls(text);
+      urlIndex = urlIndex || 0;
+      if(urlIndex >= urls.length){
+        card.classList.remove('is-loading');
+        showBanner('在线发音加载失败，请检查网络后重试');
         return;
       }
 
-      // 再次点击同一张卡片 → 停止朗读
-      if(currentCard === card){
-        window.speechSynthesis.cancel();
-        clearPlaying();
-        return;
-      }
+      card.classList.add('is-loading');
+      sharedAudio.pause();
+      sharedAudio.src = urls[urlIndex];
+      sharedAudio.playbackRate = slowMode ? 0.72 : 1;
 
-      // 关键修复3：安卓部分浏览器在 cancel 后需要一个微小延迟再 speak，
-      // 否则新的朗读请求会被吞掉；同时 resume() 可以解除偶发的“卡住暂停”状态。
+      const onCanPlay = function(){
+        card.classList.remove('is-loading');
+      };
+      const onPlay = function(){
+        currentCard = card;
+        card.classList.remove('is-loading');
+        card.classList.add('is-playing');
+      };
+      const onEnd = function(){
+        card.classList.remove('is-playing');
+        if(currentCard === card) currentCard = null;
+        cleanupListeners();
+      };
+      const onErr = function(){
+        cleanupListeners();
+        // 第一条线路失败，自动尝试下一条线路
+        speakOnline(text, card, urlIndex + 1);
+      };
+      function cleanupListeners(){
+        sharedAudio.removeEventListener('canplay', onCanPlay);
+        sharedAudio.removeEventListener('play', onPlay);
+        sharedAudio.removeEventListener('ended', onEnd);
+        sharedAudio.removeEventListener('error', onErr);
+      }
+      sharedAudio.addEventListener('canplay', onCanPlay);
+      sharedAudio.addEventListener('play', onPlay);
+      sharedAudio.addEventListener('ended', onEnd);
+      sharedAudio.addEventListener('error', onErr);
+
+      sharedAudio.play().catch(function(){
+        cleanupListeners();
+        card.classList.remove('is-loading');
+        showBanner('播放被拦截，请再点一次卡片');
+      });
+    }
+
+    function speakNative(text, card){
       window.speechSynthesis.cancel();
-      clearPlaying();
-
       const utter = new SpeechSynthesisUtterance(text);
-      livingUtterance = utter; // 持有引用，防止被提前回收
+      livingUtterance = utter;
       utter.lang = 'ja-JP';
       if(jaVoice) utter.voice = jaVoice;
       utter.rate = slowMode ? 0.65 : 0.95;
@@ -777,14 +825,12 @@
         livingUtterance = null;
       };
 
-      // 关键修复4：静默失败探测。有些环境 speak() 调用后既不报错也不触发
-      // onstart（常见于内置浏览器/缺少日语语音包），用一个短超时兜底提示用户。
       clearTimeout(watchdogTimer);
       watchdogTimer = setTimeout(function(){
         if(currentCard !== card){
-          showBanner(isInApp
-            ? '当前内置浏览器不支持朗读，请用系统浏览器打开本页'
-            : '朗读没有声音？请检查手机静音键/媒体音量，或该机型缺少日语语音包');
+          // 本地合成静默失败：记住这一点，之后直接走在线语音，不用再等待
+          nativeFailedOnce = true;
+          speakOnline(text, card);
         }
       }, 900);
 
@@ -793,12 +839,38 @@
           window.speechSynthesis.resume();
           window.speechSynthesis.speak(utter);
         }catch(e){
-          showBanner('朗读失败，请重试一次');
+          nativeFailedOnce = true;
+          speakOnline(text, card);
         }
       }, 30);
     }
 
-    // 给每张卡片插入喇叭图标（避免手动改动513张卡片的HTML）
+    function speakCard(card){
+      const jpEl = card.querySelector('.jp');
+      if(!jpEl) return;
+      const text = jpEl.textContent.trim();
+      if(!text) return;
+
+      // 再次点击同一张正在播放/加载的卡片 → 停止
+      if(currentCard === card){
+        window.speechSynthesis && window.speechSynthesis.cancel();
+        sharedAudio.pause();
+        clearPlaying();
+        return;
+      }
+
+      window.speechSynthesis && window.speechSynthesis.cancel();
+      sharedAudio.pause();
+      clearPlaying();
+
+      if(nativeSupported && !nativeFailedOnce){
+        speakNative(text, card);
+      } else {
+        speakOnline(text, card);
+      }
+    }
+
+    // 给每张卡片插入喇叭图标
     document.querySelectorAll('.card').forEach(function(card){
       const icon = document.createElement('span');
       icon.className = 'speak-icon';
@@ -816,7 +888,7 @@
       });
     });
 
-    // 语速切换按钮
+    // 语速切换按钮（对本地合成与在线音频均生效）
     const rateBtn = document.getElementById('rateToggle');
     if(rateBtn){
       rateBtn.addEventListener('click', function(){
@@ -826,20 +898,18 @@
       });
     }
 
-    // 离开页面时停止朗读，避免切换标签页后声音还在播
+    // 离开页面时停止朗读
     document.addEventListener('visibilitychange', function(){
-      if(document.hidden && supported){
-        window.speechSynthesis.cancel();
+      if(document.hidden){
+        window.speechSynthesis && window.speechSynthesis.cancel();
+        sharedAudio.pause();
         clearPlaying();
       }
     });
 
-    // 关键修复5：部分安卓 Chrome 在朗读超过约15秒或标签页失焦重新激活后，
-    // 语音引擎会卡在暂停状态且不再响应，需要周期性 resume() 保活。
+    // 安卓部分浏览器语音引擎会卡死在暂停状态，定时唤醒
     setInterval(function(){
-      if(supported && window.speechSynthesis.speaking && !window.speechSynthesis.paused){
-        // 正常朗读中，无需处理
-      } else if(supported && window.speechSynthesis.paused){
+      if(nativeSupported && window.speechSynthesis.paused){
         window.speechSynthesis.resume();
       }
     }, 4000);
