@@ -652,32 +652,82 @@
 </script>
 
 <script>
-  // ============ 点击发音（Web Speech API） ============
+  // ============ 点击发音（Web Speech API，含移动端兼容修复） ============
   (function(){
     const SPEAK_ICON_SVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3z"/><path d="M16.5 12c0-1.77-.77-3.29-2-4.2v8.4c1.23-.91 2-2.43 2-4.2z" opacity="0.85"/><path d="M14.5 4.6v1.9c2.89 1.02 5 3.77 5 5.5s-2.11 4.48-5 5.5v1.9c3.89-1.19 6.5-4.16 6.5-7.4s-2.61-6.21-6.5-7.4z" opacity="0.6"/></svg>';
 
-    const supported = 'speechSynthesis' in window;
+    const supported = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
     const banner = document.getElementById('ttsBanner');
     let slowMode = false;
     let currentCard = null;
     let jaVoice = null;
+    let voicesReady = false;
+    // 关键修复1：某些移动端浏览器（尤其 iOS Safari）在朗读开始前会把 utterance
+    // 对象垃圾回收，导致朗读“静默失败”。用一个模块级变量长期持有引用即可避免。
+    let livingUtterance = null;
+    let unlocked = false;
+    let watchdogTimer = null;
 
-    // 尝试挑选一个日语语音（不同浏览器/系统提供的语音列表加载是异步的）
+    const ua = navigator.userAgent || '';
+    const isInApp = /MicroMessenger|QQ\/|Weibo|AlipayClient|DingTalk|ByteDance|musical_ly|Line\/|FBAN|FBAV/i.test(ua);
+
+    function showBanner(msg, ms){
+      if(!banner) return;
+      banner.textContent = msg;
+      banner.classList.add('show');
+      clearTimeout(banner._t);
+      banner._t = setTimeout(()=>banner.classList.remove('show'), ms || 3200);
+    }
+
+    // ---- 语音列表加载：移动端常常需要等一小会儿甚至需要用户先交互一次 ----
     function pickJaVoice(){
       if(!supported) return;
       const voices = window.speechSynthesis.getVoices();
-      jaVoice = voices.find(v => v.lang === 'ja-JP') ||
-                voices.find(v => v.lang && v.lang.toLowerCase().startsWith('ja')) ||
-                null;
+      if(voices && voices.length){
+        voicesReady = true;
+        jaVoice = voices.find(v => v.lang === 'ja-JP') ||
+                  voices.find(v => v.lang && v.lang.toLowerCase().startsWith('ja')) ||
+                  null;
+      }
+    }
+    function pollVoicesUntilReady(retries){
+      pickJaVoice();
+      if(voicesReady || retries <= 0) return;
+      setTimeout(()=>pollVoicesUntilReady(retries - 1), 300);
     }
     if(supported){
       pickJaVoice();
       window.speechSynthesis.onvoiceschanged = pickJaVoice;
+      pollVoicesUntilReady(8); // 最多轮询约2.4秒，兼容加载较慢的安卓机型
+    }
+
+    // ---- 关键修复2：首次用户交互时“热身”一次语音引擎 ----
+    // iOS / 部分安卓浏览器要求语音合成必须发生在用户手势的调用栈内，
+    // 且第一次调用容易失败。这里在用户第一次点击页面任意位置时，
+    // 预先 speak 一个空白/极短内容并立即 cancel，把引擎“唤醒”。
+    function unlockSpeechOnce(){
+      if(unlocked || !supported) return;
+      unlocked = true;
+      try{
+        const warm = new SpeechSynthesisUtterance('.');
+        warm.volume = 0;
+        warm.lang = 'ja-JP';
+        window.speechSynthesis.speak(warm);
+        setTimeout(()=>window.speechSynthesis.cancel(), 60);
+      }catch(e){ /* 忽略热身失败，不影响后续正常朗读尝试 */ }
+    }
+    document.addEventListener('touchend', unlockSpeechOnce, {once:true, passive:true});
+    document.addEventListener('click', unlockSpeechOnce, {once:true});
+
+    if(isInApp){
+      // 微信/QQ/微博等内置浏览器普遍屏蔽或阉割了语音合成能力
+      showBanner('检测到当前可能在App内置浏览器中打开，朗读功能受限。建议点右上角菜单选择"在浏览器中打开"', 5000);
     }
 
     function clearPlaying(){
       if(currentCard){ currentCard.classList.remove('is-playing'); }
       currentCard = null;
+      clearTimeout(watchdogTimer);
     }
 
     function speakCard(card){
@@ -687,8 +737,7 @@
       if(!text) return;
 
       if(!supported){
-        banner.classList.add('show');
-        setTimeout(()=>banner.classList.remove('show'), 2600);
+        showBanner('你的浏览器不支持语音朗读，换新版 Safari / Chrome 试试吧');
         return;
       }
 
@@ -699,29 +748,54 @@
         return;
       }
 
+      // 关键修复3：安卓部分浏览器在 cancel 后需要一个微小延迟再 speak，
+      // 否则新的朗读请求会被吞掉；同时 resume() 可以解除偶发的“卡住暂停”状态。
       window.speechSynthesis.cancel();
       clearPlaying();
 
       const utter = new SpeechSynthesisUtterance(text);
+      livingUtterance = utter; // 持有引用，防止被提前回收
       utter.lang = 'ja-JP';
       if(jaVoice) utter.voice = jaVoice;
       utter.rate = slowMode ? 0.65 : 0.95;
       utter.pitch = 1;
+      utter.volume = 1;
 
       utter.onstart = function(){
+        clearTimeout(watchdogTimer);
         currentCard = card;
         card.classList.add('is-playing');
       };
       utter.onend = function(){
         card.classList.remove('is-playing');
         if(currentCard === card) currentCard = null;
+        livingUtterance = null;
       };
       utter.onerror = function(){
         card.classList.remove('is-playing');
         if(currentCard === card) currentCard = null;
+        livingUtterance = null;
       };
 
-      window.speechSynthesis.speak(utter);
+      // 关键修复4：静默失败探测。有些环境 speak() 调用后既不报错也不触发
+      // onstart（常见于内置浏览器/缺少日语语音包），用一个短超时兜底提示用户。
+      clearTimeout(watchdogTimer);
+      watchdogTimer = setTimeout(function(){
+        if(currentCard !== card){
+          showBanner(isInApp
+            ? '当前内置浏览器不支持朗读，请用系统浏览器打开本页'
+            : '朗读没有声音？请检查手机静音键/媒体音量，或该机型缺少日语语音包');
+        }
+      }, 900);
+
+      setTimeout(function(){
+        try{
+          window.speechSynthesis.resume();
+          window.speechSynthesis.speak(utter);
+        }catch(e){
+          showBanner('朗读失败，请重试一次');
+        }
+      }, 30);
     }
 
     // 给每张卡片插入喇叭图标（避免手动改动513张卡片的HTML）
@@ -759,6 +833,16 @@
         clearPlaying();
       }
     });
+
+    // 关键修复5：部分安卓 Chrome 在朗读超过约15秒或标签页失焦重新激活后，
+    // 语音引擎会卡在暂停状态且不再响应，需要周期性 resume() 保活。
+    setInterval(function(){
+      if(supported && window.speechSynthesis.speaking && !window.speechSynthesis.paused){
+        // 正常朗读中，无需处理
+      } else if(supported && window.speechSynthesis.paused){
+        window.speechSynthesis.resume();
+      }
+    }, 4000);
   })();
 </script>
 
