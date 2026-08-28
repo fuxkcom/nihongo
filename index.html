@@ -280,6 +280,47 @@
     flex-shrink:0;
   }
   .navbar a:hover{ background:var(--gold); color:#fff; border-color:var(--gold); }
+
+  /* ---------- 点击发音 ---------- */
+  .card{ position:relative; cursor:pointer; }
+  .card .speak-icon{
+    position:absolute; top:14px; right:14px;
+    width:26px; height:26px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(201,138,62,0.10);
+    color:var(--gold); opacity:0; transform:scale(0.85);
+    transition:opacity .15s ease, transform .15s ease, background .15s ease;
+    pointer-events:none;
+  }
+  .card:hover .speak-icon{ opacity:1; transform:scale(1); }
+  .card .speak-icon svg{ width:13px; height:13px; }
+  .card.is-playing{ box-shadow:0 0 0 2px var(--gold); }
+  .card.is-playing .speak-icon{
+    opacity:1; transform:scale(1);
+    background:var(--gold); color:#fff;
+    animation:pulseIcon 1s ease-in-out infinite;
+  }
+  @keyframes pulseIcon{ 0%,100%{ box-shadow:0 0 0 0 rgba(201,138,62,0.5);} 50%{ box-shadow:0 0 0 6px rgba(201,138,62,0);} }
+  .p-night .card .speak-icon{ background:rgba(255,255,255,0.12); color:#e8e6ff; }
+  .p-night .card.is-playing .speak-icon{ background:var(--gold); color:#fff; }
+  .card .jp{ padding-right:26px; }
+
+  /* 语音不可用时的提示条 */
+  .tts-banner{
+    display:none; position:fixed; left:50%; bottom:22px; transform:translateX(-50%);
+    background:#2c2620; color:#fbf8f2; font-size:12.5px; padding:10px 18px;
+    border-radius:30px; z-index:100; box-shadow:0 8px 24px rgba(0,0,0,0.25);
+    white-space:nowrap;
+  }
+  .tts-banner.show{ display:block; }
+
+  /* 语速切换按钮（导航栏内） */
+  .rate-toggle{
+    margin-left:10px; font-size:11px; padding:5px 12px; border-radius:20px;
+    border:1px solid var(--gold); background:#fff; color:var(--gold);
+    cursor:pointer; flex-shrink:0; font-weight:700;
+  }
+  .rate-toggle.active{ background:var(--gold); color:#fff; }
 </style>
 </head>
 <body>
@@ -293,6 +334,7 @@
   <span class="navlabel" style="margin-left:14px;">场景大全</span>
   <a href="#part-travel">出行</a><a href="#part-shop">购物</a><a href="#part-food">餐饮</a>
   <a href="#part-errand">办事</a><a href="#part-social">社交</a><a href="#part-emg">应急</a>
+  <button class="rate-toggle" id="rateToggle" title="切换朗读语速">🐢 慢速朗读</button>
 </nav>
 
 <!-- ============ HERO ============ -->
@@ -563,6 +605,8 @@
   <div>把这26个场景、513条短语，过成你每天的日语练习 · がんばって！</div>
 </footer>
 
+<div class="tts-banner" id="ttsBanner">你的浏览器不支持语音朗读，换 Chrome / Edge / Safari 试试吧</div>
+
 <script>
   // 侧边时间轴：随滚动位置移动圆点，仅在"时间线"区域显示
   const sections = Array.from(document.querySelectorAll('.period'));
@@ -605,6 +649,117 @@
   window.addEventListener('scroll', updateTrack, {passive:true});
   window.addEventListener('resize', updateTrack);
   updateTrack();
+</script>
+
+<script>
+  // ============ 点击发音（Web Speech API） ============
+  (function(){
+    const SPEAK_ICON_SVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3z"/><path d="M16.5 12c0-1.77-.77-3.29-2-4.2v8.4c1.23-.91 2-2.43 2-4.2z" opacity="0.85"/><path d="M14.5 4.6v1.9c2.89 1.02 5 3.77 5 5.5s-2.11 4.48-5 5.5v1.9c3.89-1.19 6.5-4.16 6.5-7.4s-2.61-6.21-6.5-7.4z" opacity="0.6"/></svg>';
+
+    const supported = 'speechSynthesis' in window;
+    const banner = document.getElementById('ttsBanner');
+    let slowMode = false;
+    let currentCard = null;
+    let jaVoice = null;
+
+    // 尝试挑选一个日语语音（不同浏览器/系统提供的语音列表加载是异步的）
+    function pickJaVoice(){
+      if(!supported) return;
+      const voices = window.speechSynthesis.getVoices();
+      jaVoice = voices.find(v => v.lang === 'ja-JP') ||
+                voices.find(v => v.lang && v.lang.toLowerCase().startsWith('ja')) ||
+                null;
+    }
+    if(supported){
+      pickJaVoice();
+      window.speechSynthesis.onvoiceschanged = pickJaVoice;
+    }
+
+    function clearPlaying(){
+      if(currentCard){ currentCard.classList.remove('is-playing'); }
+      currentCard = null;
+    }
+
+    function speakCard(card){
+      const jpEl = card.querySelector('.jp');
+      if(!jpEl) return;
+      const text = jpEl.textContent.trim();
+      if(!text) return;
+
+      if(!supported){
+        banner.classList.add('show');
+        setTimeout(()=>banner.classList.remove('show'), 2600);
+        return;
+      }
+
+      // 再次点击同一张卡片 → 停止朗读
+      if(currentCard === card){
+        window.speechSynthesis.cancel();
+        clearPlaying();
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+      clearPlaying();
+
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'ja-JP';
+      if(jaVoice) utter.voice = jaVoice;
+      utter.rate = slowMode ? 0.65 : 0.95;
+      utter.pitch = 1;
+
+      utter.onstart = function(){
+        currentCard = card;
+        card.classList.add('is-playing');
+      };
+      utter.onend = function(){
+        card.classList.remove('is-playing');
+        if(currentCard === card) currentCard = null;
+      };
+      utter.onerror = function(){
+        card.classList.remove('is-playing');
+        if(currentCard === card) currentCard = null;
+      };
+
+      window.speechSynthesis.speak(utter);
+    }
+
+    // 给每张卡片插入喇叭图标（避免手动改动513张卡片的HTML）
+    document.querySelectorAll('.card').forEach(function(card){
+      const icon = document.createElement('span');
+      icon.className = 'speak-icon';
+      icon.innerHTML = SPEAK_ICON_SVG;
+      card.appendChild(icon);
+      card.addEventListener('click', function(){ speakCard(card); });
+      card.setAttribute('role','button');
+      card.setAttribute('tabindex','0');
+      card.setAttribute('aria-label','点击朗读日语');
+      card.addEventListener('keydown', function(e){
+        if(e.key === 'Enter' || e.key === ' '){
+          e.preventDefault();
+          speakCard(card);
+        }
+      });
+    });
+
+    // 语速切换按钮
+    const rateBtn = document.getElementById('rateToggle');
+    if(rateBtn){
+      rateBtn.addEventListener('click', function(){
+        slowMode = !slowMode;
+        rateBtn.textContent = slowMode ? '🐢 慢速中' : '🐢 慢速朗读';
+        rateBtn.classList.toggle('active', slowMode);
+      });
+    }
+
+    // 离开页面时停止朗读，避免切换标签页后声音还在播
+    document.addEventListener('visibilitychange', function(){
+      if(document.hidden && supported){
+        window.speechSynthesis.cancel();
+        clearPlaying();
+      }
+    });
+  })();
 </script>
 
 </body>
