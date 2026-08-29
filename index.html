@@ -1507,19 +1507,12 @@
     </script>
 
     <script>
-        // ============ 语音朗读核心模块（修复版） ============
-        // 改进要点：
-        // 1. 修复在线音频 tryNext 双重触发 bug（使用 token 防重入）
-        // 2. 改进本地语音检测：只有确认日语语音可用才使用本地合成
-        // 3. 音频缓存：相同短语不重复请求网络
-        // 4. 更合理的超时：本地合成 1.5s 无响应才 fallback
-        // 5. 加载状态可视化（旋转喇叭图标）
-        // 6. 更详细的调试日志（可开关）
+       // ============ 语音朗读模块（修复版）============
         (function() {
             const SPEAK_ICON_SVG =
                 '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3z"/><path d="M16.5 12c0-1.77-.77-3.29-2-4.2v8.4c1.23-.91 2-2.43 2-4.2z" opacity="0.85"/><path d="M14.5 4.6v1.9c2.89 1.02 5 3.77 5 5.5s-2.11 4.48-5 5.5v1.9c3.89-1.19 6.5-4.16 6.5-7.4s-2.61-6.21-6.5-7.4z" opacity="0.6"/></svg>';
 
-            const DEBUG = false; // 设为 true 可在控制台看详细日志
+            const DEBUG = false;
             const banner = document.getElementById('ttsBanner');
             const ttsAudio = document.getElementById('ttsAudio');
             const nativeSupported = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
@@ -1531,8 +1524,8 @@
             let nativeFailedOnce = false;
             let livingUtterance = null;
             let watchdogTimer = null;
-            let audioToken = 0; // 防重入token
-            const audioCache = new Map(); // 缓存成功加载过的URL
+            let audioToken = 0;
+            const audioCache = new Map();
 
             const ua = navigator.userAgent || '';
             const isInApp = /MicroMessenger|QQ\/|Weibo|AlipayClient|DingTalk|ByteDance|musical_ly|Line\//i.test(ua);
@@ -1540,7 +1533,6 @@
 
             function log(...args) { if (DEBUG) console.log('[TTS]', ...args); }
 
-            // ---- 提示条 ----
             function showBanner(msg, ms) {
                 if (!banner) return;
                 banner.innerHTML = '';
@@ -1572,7 +1564,6 @@
                 banner._t = setTimeout(() => banner.classList.remove('show'), ms || 8000);
             }
 
-            // ---- 本地语音合成 ----
             function pickJaVoice() {
                 if (!nativeSupported) return;
                 try {
@@ -1582,7 +1573,7 @@
                         jaVoice = voices.find(v => v.lang === 'ja-JP') ||
                             voices.find(v => v.lang && v.lang.toLowerCase().startsWith('ja')) ||
                             null;
-                        log('日语语音:', jaVoice ? jaVoice.name : '未找到');
+                        log('日语语音:', jaVoice ? jaVoice.name : '未找到，将尝试默认');
                     }
                 } catch (e) { log('getVoices error', e); }
             }
@@ -1590,15 +1581,14 @@
             function pollVoicesUntilReady(retries) {
                 pickJaVoice();
                 if (voicesReady || retries <= 0) return;
-                setTimeout(() => pollVoicesUntilReady(retries - 1), 300);
+                setTimeout(() => pollVoicesUntilReady(retries - 1), 400);
             }
             if (nativeSupported) {
                 pickJaVoice();
                 window.speechSynthesis.onvoiceschanged = pickJaVoice;
-                pollVoicesUntilReady(8);
+                pollVoicesUntilReady(12);
             }
 
-            // ---- 首次交互热身 ----
             let unlocked = false;
 
             function unlockSpeechOnce() {
@@ -1615,25 +1605,19 @@
             document.addEventListener('touchend', unlockSpeechOnce, { once: true, passive: true });
             document.addEventListener('click', unlockSpeechOnce, { once: true });
 
-            if (isInApp) {
-                showFailBanner('检测到可能在App内置浏览器中打开，朗读可能受限', 6000);
-            }
-            if (isAndroidWebView && nativeSupported) {
-                log('Android WebView 检测，本地语音可能不可靠');
-            }
+            if (isInApp) showFailBanner('检测到可能在App内置浏览器中打开，朗读可能受限', 6000);
+            if (isAndroidWebView && nativeSupported) log('Android WebView 检测，本地语音可能不可靠');
 
-            // ---- 在线语音源（优先级从高到低） ----
-            // 百度翻译 → 有道词典 → Google翻译
+            // 在线语音源（按优先级）
             function onlineUrls(text) {
                 const q = encodeURIComponent(text);
                 return [
                     'https://fanyi.baidu.com/gettts?lan=jp&text=' + q + '&spd=3&source=web',
                     'https://dict.youdao.com/dictvoice?audio=' + q + '&le=jap',
-                    'https://translate.google.com/translate_tts?ie=UTF-8&q=' + q + '&tl=ja&client=tw-ob'
+                    'https://translate.googleapis.com/translate_tts?ie=UTF-8&client=tw-ob&q=' + q + '&tl=ja'
                 ];
             }
 
-            // ---- 停止播放 ----
             function stopAllAudio() {
                 if (nativeSupported) { try { window.speechSynthesis.cancel(); } catch (e) {} }
                 ttsAudio.pause();
@@ -1650,7 +1634,6 @@
                 clearTimeout(watchdogTimer);
             }
 
-            // ---- 在线播放 ----
             function speakOnline(text, card, urlIndex) {
                 const urls = onlineUrls(text);
                 urlIndex = urlIndex || 0;
@@ -1670,12 +1653,11 @@
                 try { ttsAudio.currentTime = 0; } catch (e) {}
 
                 const url = urls[urlIndex];
-                // 检查缓存：如果已成功加载过，直接复用
-                if (audioCache.has(url)) {
-                    log('使用缓存URL:', url);
-                }
                 ttsAudio.src = url;
                 ttsAudio.playbackRate = slowMode ? 0.72 : 1;
+
+                // 关键：强制加载
+                try { ttsAudio.load(); } catch (e) {}
 
                 let settled = false;
 
@@ -1728,7 +1710,6 @@
                 if (playPromise && typeof playPromise.catch === 'function') {
                     playPromise.catch(function() { tryNext(); });
                 }
-                // 设置加载超时
                 setTimeout(() => {
                     if (!settled && myToken === audioToken && currentCard !== card) {
                         log('加载超时，尝试下一个源');
@@ -1737,7 +1718,6 @@
                 }, 6000);
             }
 
-            // ---- 本地语音合成 ----
             function speakNative(text, card) {
                 const myToken = audioToken;
                 window.speechSynthesis.cancel();
@@ -1799,14 +1779,12 @@
                 }, 30);
             }
 
-            // ---- 主入口 ----
             function speakCard(card) {
                 const jpEl = card.querySelector('.jp');
                 if (!jpEl) return;
                 const text = jpEl.textContent.trim();
                 if (!text) return;
 
-                // 再次点击同一张正在播放/加载的卡片 → 停止
                 if (currentCard === card) {
                     stopAllAudio();
                     clearPlayingState();
@@ -1816,8 +1794,8 @@
                 stopAllAudio();
                 clearPlayingState();
 
-                // 决定策略：优先本地合成（仅当可靠），否则直接在线
-                const useNative = nativeSupported && !nativeFailedOnce && jaVoice !== null;
+                // 放宽条件：即使 jaVoice 为 null，只要 nativeSupported 且未失败过，就尝试本地合成
+                const useNative = nativeSupported && !nativeFailedOnce;
                 if (useNative) {
                     speakNative(text, card);
                 } else {
@@ -1825,7 +1803,6 @@
                 }
             }
 
-            // ---- 给所有卡片挂事件 ----
             document.querySelectorAll('.card').forEach(function(card) {
                 const icon = document.createElement('span');
                 icon.className = 'speak-icon';
@@ -1843,7 +1820,6 @@
                 });
             });
 
-            // ---- 语速切换 ----
             const rateBtn = document.getElementById('rateToggle');
             if (rateBtn) {
                 rateBtn.addEventListener('click', function() {
@@ -1853,7 +1829,6 @@
                 });
             }
 
-            // ---- 页面隐藏时停止 ----
             document.addEventListener('visibilitychange', function() {
                 if (document.hidden) {
                     stopAllAudio();
@@ -1861,7 +1836,6 @@
                 }
             });
 
-            // ---- 安卓语音引擎卡死恢复 ----
             setInterval(function() {
                 if (nativeSupported && window.speechSynthesis.paused) {
                     try { window.speechSynthesis.resume(); } catch (e) {}
