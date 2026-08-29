@@ -606,6 +606,7 @@
 </footer>
 
 <div class="tts-banner" id="ttsBanner">你的浏览器不支持语音朗读，换 Chrome / Edge / Safari 试试吧</div>
+<audio id="ttsAudio" style="display:none" preload="none" referrerpolicy="no-referrer" playsinline></audio>
 
 <script>
   // 侧边时间轴：随滚动位置移动圆点，仅在"时间线"区域显示
@@ -725,10 +726,10 @@
       showBanner('检测到可能在App内置浏览器中打开，若无法播放请用系统浏览器打开本页', 5000);
     }
 
-    // ---- 共享的 <audio> 元素，用于在线语音播放 ----
-    const sharedAudio = new Audio();
-    sharedAudio.preload = 'none';
-    let audioCardMap = new WeakMap(); // 记录当前 audio 对应的卡片
+    // ---- 使用页面里预置的真实 <audio> 元素（而非JS动态创建），
+    //      部分老版本 Android WebView 对动态创建的 Audio 对象判定
+    //      用户手势不够稳定，用真实DOM元素兼容性更好 ----
+    const ttsAudio = document.getElementById('ttsAudio');
 
     function clearPlaying(){
       if(currentCard){
@@ -739,11 +740,14 @@
       clearTimeout(watchdogTimer);
     }
 
-    // 在线语音源：优先有道词典发音接口（国内可直接访问，无需科学上网），
-    // 如果失败再退回 Google 翻译语音接口作为补充线路
+    // 在线语音源，按国内可访问性与防盗链宽松程度排序：
+    // 1. 百度翻译语音接口（国内直连，防盗链限制较宽松）
+    // 2. 有道词典发音接口（国内直连）
+    // 3. Google 翻译语音接口（国外网络环境的补充线路）
     function onlineUrls(text){
       const q = encodeURIComponent(text);
       return [
+        'https://fanyi.baidu.com/gettts?lan=jp&text=' + q + '&spd=3&source=web',
         'https://dict.youdao.com/dictvoice?audio=' + q + '&le=jap',
         'https://translate.google.com/translate_tts?ie=UTF-8&q=' + q + '&tl=ja&client=tw-ob'
       ];
@@ -754,49 +758,53 @@
       urlIndex = urlIndex || 0;
       if(urlIndex >= urls.length){
         card.classList.remove('is-loading');
-        showBanner('在线发音加载失败，请检查网络后重试');
+        showBanner('在线发音暂时无法播放，请检查网络后重试');
         return;
       }
 
       card.classList.add('is-loading');
-      sharedAudio.pause();
-      sharedAudio.src = urls[urlIndex];
-      sharedAudio.playbackRate = slowMode ? 0.72 : 1;
+      ttsAudio.pause();
+      try{ ttsAudio.currentTime = 0; }catch(e){}
+      ttsAudio.src = urls[urlIndex];
+      ttsAudio.playbackRate = slowMode ? 0.72 : 1;
 
-      const onCanPlay = function(){
-        card.classList.remove('is-loading');
-      };
-      const onPlay = function(){
+      function cleanupListeners(){
+        ttsAudio.removeEventListener('play', onPlay);
+        ttsAudio.removeEventListener('ended', onEnd);
+        ttsAudio.removeEventListener('error', onErr);
+      }
+      function onPlay(){
         currentCard = card;
         card.classList.remove('is-loading');
         card.classList.add('is-playing');
-      };
-      const onEnd = function(){
+      }
+      function onEnd(){
         card.classList.remove('is-playing');
         if(currentCard === card) currentCard = null;
         cleanupListeners();
-      };
-      const onErr = function(){
-        cleanupListeners();
-        // 第一条线路失败，自动尝试下一条线路
-        speakOnline(text, card, urlIndex + 1);
-      };
-      function cleanupListeners(){
-        sharedAudio.removeEventListener('canplay', onCanPlay);
-        sharedAudio.removeEventListener('play', onPlay);
-        sharedAudio.removeEventListener('ended', onEnd);
-        sharedAudio.removeEventListener('error', onErr);
       }
-      sharedAudio.addEventListener('canplay', onCanPlay);
-      sharedAudio.addEventListener('play', onPlay);
-      sharedAudio.addEventListener('ended', onEnd);
-      sharedAudio.addEventListener('error', onErr);
-
-      sharedAudio.play().catch(function(){
+      function tryNext(){
         cleanupListeners();
-        card.classList.remove('is-loading');
-        showBanner('播放被拦截，请再点一次卡片');
-      });
+        // 无论是媒体加载失败，还是播放被拒绝，都自动尝试下一条线路，
+        // 而不是让用户手动再点一次
+        speakOnline(text, card, urlIndex + 1);
+      }
+      function onErr(){ tryNext(); }
+
+      ttsAudio.addEventListener('play', onPlay);
+      ttsAudio.addEventListener('ended', onEnd);
+      ttsAudio.addEventListener('error', onErr);
+
+      let playPromise;
+      try{
+        playPromise = ttsAudio.play();
+      }catch(e){
+        tryNext();
+        return;
+      }
+      if(playPromise && typeof playPromise.catch === 'function'){
+        playPromise.catch(function(){ tryNext(); });
+      }
     }
 
     function speakNative(text, card){
@@ -854,13 +862,13 @@
       // 再次点击同一张正在播放/加载的卡片 → 停止
       if(currentCard === card){
         window.speechSynthesis && window.speechSynthesis.cancel();
-        sharedAudio.pause();
+        ttsAudio.pause();
         clearPlaying();
         return;
       }
 
       window.speechSynthesis && window.speechSynthesis.cancel();
-      sharedAudio.pause();
+      ttsAudio.pause();
       clearPlaying();
 
       if(nativeSupported && !nativeFailedOnce){
@@ -902,7 +910,7 @@
     document.addEventListener('visibilitychange', function(){
       if(document.hidden){
         window.speechSynthesis && window.speechSynthesis.cancel();
-        sharedAudio.pause();
+        ttsAudio.pause();
         clearPlaying();
       }
     });
